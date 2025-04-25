@@ -12,10 +12,10 @@
         tools:layout="@layout/fragment_home" />
 
     <fragment
-        android:id="@+id/nav_gallery"
-        android:name="com.example.apptorneosajedrez.ui.gallery.GalleryFragment"
+        android:id="@+id/nav_torneos"
+        android:name="com.example.apptorneosajedrez.ui.torneos.TorneosFragment"
         android:label="@string/menu_torneos"
-        tools:layout="@layout/fragment_gallery" />
+        tools:layout="@layout/fragment_torneos" />
 
     <fragment
         android:id="@+id/nav_jugadores"
