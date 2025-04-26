@@ -17,8 +17,8 @@
             android:icon="@drawable/ic_menu_slideshow"
             android:title="@string/menu_jugadores" />
         <item
-            android:id="@+id/nav_slideshow2"
-            android:icon="@drawable/ic_menu_camera"
+            android:id="@+id/nav_inscripciones"
+            android:icon="@drawable/ic_menu_inscriptos"
             android:title="@string/menu_inscripciones" />
 
     </group>

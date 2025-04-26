@@ -24,9 +24,9 @@
         tools:layout="@layout/fragment_jugadores" />
 
     <fragment
-        android:id="@+id/nav_slideshow2"
-        android:name="com.example.apptorneosajedrez.ui.slideshow.SlideshowFragment"
+        android:id="@+id/nav_inscripciones"
+        android:name="com.example.apptorneosajedrez.ui.inscripciones.InscripcionesFragment"
         android:label="@string/menu_inscripciones"
-        tools:layout="@layout/fragment_slideshow" />
+        tools:layout="@layout/fragment_inscripciones" />
 
 </navigation>
