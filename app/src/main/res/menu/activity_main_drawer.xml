@@ -6,19 +6,19 @@
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/nav_home"
-            android:icon="@drawable/ic_menu_camera"
+            android:icon="@drawable/ic_home"
             android:title="@string/menu_inicio" />
         <item
             android:id="@+id/nav_torneos"
-            android:icon="@drawable/trofeo_campeonato"
+            android:icon="@drawable/ic_trofeo"
             android:title="@string/menu_torneos" />
         <item
             android:id="@+id/nav_jugadores"
-            android:icon="@drawable/ic_menu_slideshow"
+            android:icon="@drawable/ic_jugador"
             android:title="@string/menu_jugadores" />
         <item
             android:id="@+id/nav_inscripciones"
-            android:icon="@drawable/ic_menu_inscriptos"
+            android:icon="@drawable/ic_lapiz"
             android:title="@string/menu_inscripciones" />
 
     </group>
