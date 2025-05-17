@@ -1,4 +1,4 @@
-package com.example.apptorneosajedrez.ui.slideshow
+package com.example.apptorneosajedrez.ui.jugadores
 
 import android.os.Bundle
 import android.view.LayoutInflater
