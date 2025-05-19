@@ -4,9 +4,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
 import androidx.fragment.app.Fragment
 import com.example.apptorneosajedrez.databinding.FragmentJugadoresBinding
+
 class JugadoresFragment : Fragment() {
 
     private var _binding: FragmentJugadoresBinding? = null
@@ -28,8 +28,8 @@ class JugadoresFragment : Fragment() {
         _binding = FragmentJugadoresBinding.inflate(inflater, container, false)
         val root = binding.root
 
-        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, jugadores)
-        binding.listViewJugadores.adapter = adapter
+        val adapter = JugadorAdapter(jugadores)
+        binding.recyclerViewJugadores.adapter = adapter
 
         return root
     }

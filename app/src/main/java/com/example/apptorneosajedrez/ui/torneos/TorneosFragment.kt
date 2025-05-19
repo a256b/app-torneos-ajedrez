@@ -10,6 +10,7 @@ import android.widget.ArrayAdapter
 import com.example.apptorneosajedrez.R
 import com.example.apptorneosajedrez.databinding.FragmentJugadoresBinding
 import com.example.apptorneosajedrez.databinding.FragmentTorneosBinding
+import com.example.apptorneosajedrez.ui.torneos.TorneoAdapter
 
 class TorneosFragment : Fragment() {
 
@@ -48,8 +49,8 @@ class TorneosFragment : Fragment() {
         _binding = FragmentTorneosBinding.inflate(inflater, container, false)
         val root = binding.root
 
-        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_list_item_1, torneos)
-        binding.listViewTorneos.adapter = adapter
+        val adapter = TorneoAdapter(torneos)
+        binding.recyclerViewTorneos.adapter = adapter
 
         return root
     }
