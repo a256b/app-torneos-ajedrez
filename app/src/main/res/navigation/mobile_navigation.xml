@@ -15,7 +15,11 @@
         android:id="@+id/nav_torneos"
         android:name="com.example.apptorneosajedrez.ui.torneos.TorneosFragment"
         android:label="@string/menu_torneos"
-        tools:layout="@layout/fragment_torneos" />
+        tools:layout="@layout/fragment_torneos" >
+        <action
+            android:id="@+id/action_nav_torneos_to_nuevoTorneoFragment2"
+            app:destination="@id/nuevoTorneoFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/nav_jugadores"
@@ -28,5 +32,10 @@
         android:name="com.example.apptorneosajedrez.ui.inscripciones.InscripcionesFragment"
         android:label="@string/menu_inscripciones"
         tools:layout="@layout/fragment_inscripciones" />
+    <fragment
+        android:id="@+id/nuevoTorneoFragment"
+        android:name="com.example.apptorneosajedrez.ui.torneos.TorneoDetalleFragment"
+        android:label="fragment_nuevo_torneo"
+        tools:layout="@layout/fragment_torneo_detalle" />
 
 </navigation>
