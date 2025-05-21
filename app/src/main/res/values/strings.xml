@@ -10,4 +10,5 @@
     <string name="menu_torneos">Torneos</string>
     <string name="menu_jugadores">Jugadores</string>
     <string name="menu_inscripciones">Inscripciones</string>
+    <string name="estrella">Estrella</string>
 </resources>

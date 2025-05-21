@@ -29,17 +29,8 @@ class TorneosFragment : Fragment() {
         "Torneo de Ajedrez Mendoza",
         "Open de Ajedrez Rosario"
     )
-    companion object {
-        fun newInstance() = TorneosFragment()
-    }
 
     private val viewModel: TorneosViewModel by viewModels()
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        // TODO: Use the ViewModel
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -49,9 +40,14 @@ class TorneosFragment : Fragment() {
         _binding = FragmentTorneosBinding.inflate(inflater, container, false)
         val root = binding.root
 
-        val adapter = TorneoAdapter(torneos)
+        val adapter = TorneoAdapter(torneos, requireContext())  // Asegúrate de pasar el Context
         binding.recyclerViewTorneos.adapter = adapter
 
         return root
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

@@ -1,42 +1,49 @@
 package com.example.apptorneosajedrez.ui.home
 
+import android.content.Context
 import android.os.Bundle
+import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
-import com.example.apptorneosajedrez.databinding.FragmentHomeBinding
+import com.example.apptorneosajedrez.R
+import com.example.apptorneosajedrez.ui.torneos.KEY_TORNEO_DESTACADO
+import com.example.apptorneosajedrez.ui.torneos.PREF_NAME
 
 class HomeFragment : Fragment() {
 
-    private var _binding: FragmentHomeBinding? = null
-
-    // This property is only valid between onCreateView and
-    // onDestroyView.
-    private val binding get() = _binding!!
+    private lateinit var textViewDestacados: TextView
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
+        inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val homeViewModel =
-            ViewModelProvider(this).get(HomeViewModel::class.java)
+        val view = inflater.inflate(R.layout.fragment_home, container, false)
 
-        _binding = FragmentHomeBinding.inflate(inflater, container, false)
-        val root: View = binding.root
+        // Referencia al TextView nuevo que agregamos
+        textViewDestacados = view.findViewById(R.id.textViewDestacados)
 
-        val textView: TextView = binding.textHome
-        homeViewModel.text.observe(viewLifecycleOwner) {
-            textView.text = it
-        }
-        return root
+        // Mostrar los torneos destacados
+        mostrarFavoritos()
+
+        return view
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
+    private fun mostrarFavoritos() {
+        val prefs = requireContext().getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
+        val favoritos = prefs.getStringSet(KEY_TORNEO_DESTACADO, setOf()) ?: setOf()
+
+        if (favoritos.isNotEmpty()) {
+            val texto = favoritos.joinToString("\n") { "★ $it" }
+            textViewDestacados.text = "Torneos destacados:\n$texto"
+        } else {
+            textViewDestacados.text = "No hay torneos destacados todavía"
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        mostrarFavoritos()
     }
 }
