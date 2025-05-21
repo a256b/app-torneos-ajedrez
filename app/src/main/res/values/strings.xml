@@ -10,8 +10,8 @@
     <string name="menu_torneos">Torneos</string>
     <string name="menu_jugadores">Jugadores</string>
     <string name="menu_inscripciones">Inscripciones</string>
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="inscribirse">Inscribirse</string>
     <string name="ver_partidas">Ver Partidas</string>
+    <string name="detalle_torneo">Detalle Torneo</string>
 </resources>

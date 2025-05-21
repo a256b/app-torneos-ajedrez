@@ -35,7 +35,7 @@
     <fragment
         android:id="@+id/nuevoTorneoFragment"
         android:name="com.example.apptorneosajedrez.ui.torneos.TorneoDetalleFragment"
-        android:label="fragment_nuevo_torneo"
+        android:label="@string/detalle_torneo"
         tools:layout="@layout/fragment_torneo_detalle" />
 
 </navigation>
