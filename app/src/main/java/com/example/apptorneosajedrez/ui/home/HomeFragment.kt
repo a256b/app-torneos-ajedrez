@@ -2,48 +2,48 @@ package com.example.apptorneosajedrez.ui.home
 
 import android.content.Context
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
-import com.example.apptorneosajedrez.R
+import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.apptorneosajedrez.databinding.FragmentHomeBinding
 import com.example.apptorneosajedrez.ui.torneos.KEY_TORNEO_DESTACADO
 import com.example.apptorneosajedrez.ui.torneos.PREF_NAME
 
 class HomeFragment : Fragment() {
 
-    private lateinit var textViewDestacados: TextView
+    private var _binding: FragmentHomeBinding? = null
+    private val binding get() = _binding!!
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val view = inflater.inflate(R.layout.fragment_home, container, false)
+        _binding = FragmentHomeBinding.inflate(inflater, container, false)
+        val root = binding.root
 
-        // Referencia al TextView nuevo que agregamos
-        textViewDestacados = view.findViewById(R.id.textViewDestacados)
-
-        // Mostrar los torneos destacados
         mostrarFavoritos()
 
-        return view
+        return root
     }
 
     private fun mostrarFavoritos() {
         val prefs = requireContext().getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
-        val favoritos = prefs.getStringSet(KEY_TORNEO_DESTACADO, setOf()) ?: setOf()
+        val favoritos = prefs.getStringSet(KEY_TORNEO_DESTACADO, emptySet())?.toList() ?: emptyList()
 
-        if (favoritos.isNotEmpty()) {
-            val texto = favoritos.joinToString("\n") { "★ $it" }
-            textViewDestacados.text = "Torneos destacados:\n$texto"
-        } else {
-            textViewDestacados.text = "No hay torneos destacados todavía"
-        }
+        val adapter = DestacadosAdapter(favoritos)
+        binding.recyclerViewDestacados.layoutManager = LinearLayoutManager(requireContext())
+        binding.recyclerViewDestacados.adapter = adapter
     }
 
     override fun onResume() {
         super.onResume()
         mostrarFavoritos()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

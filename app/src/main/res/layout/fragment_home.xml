@@ -7,29 +7,28 @@
     android:layout_height="match_parent"
     tools:context=".ui.home.HomeFragment">
 
-    <!-- Título o mensaje principal -->
     <TextView
         android:id="@+id/text_home"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
+        android:text="Mis torneos destacados"
         android:textAlignment="center"
         android:textSize="20sp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- NUEVO: Lista de torneos destacados -->
-    <TextView
-        android:id="@+id/textViewDestacados"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="16dp"
-        android:text="Cargando favoritos..."
-        android:textSize="16sp"
-        android:textStyle="bold"
+    <!-- RecyclerView para torneos destacados -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerViewDestacados"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:padding="8dp"
         app:layout_constraintTop_toBottomOf="@id/text_home"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:listitem="@layout/item_torneo" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

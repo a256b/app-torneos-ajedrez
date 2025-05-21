@@ -40,7 +40,8 @@ class TorneosFragment : Fragment() {
         _binding = FragmentTorneosBinding.inflate(inflater, container, false)
         val root = binding.root
 
-        val adapter = TorneoAdapter(torneos, requireContext())  // Asegúrate de pasar el Context
+        //Envía el context
+        val adapter = TorneoAdapter(torneos, requireContext())
         binding.recyclerViewTorneos.adapter = adapter
 
         return root
