@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.example.apptorneosajedrez.R
 
@@ -40,8 +41,10 @@ class TorneoAdapter(
 
                 if (nuevosFavoritos.contains(nombreTorneo)) {
                     nuevosFavoritos.remove(nombreTorneo)
+                    Toast.makeText(context, "Torneo desmarcado", Toast.LENGTH_SHORT).show()
                 } else {
                     nuevosFavoritos.add(nombreTorneo)
+                    Toast.makeText(context, "★ Torneo destacado", Toast.LENGTH_SHORT).show()
                 }
 
                 sharedPreferences.edit()

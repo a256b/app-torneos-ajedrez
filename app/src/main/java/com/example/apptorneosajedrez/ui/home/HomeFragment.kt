@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.apptorneosajedrez.databinding.FragmentHomeBinding
@@ -35,6 +36,7 @@ class HomeFragment : Fragment() {
         val adapter = DestacadosAdapter(favoritos.toList()) { torneo ->
             favoritos.remove(torneo)
             prefs.edit().putStringSet(KEY_TORNEO_DESTACADO, favoritos).apply()
+            Toast.makeText(requireContext(), "Torneo desmarcado", Toast.LENGTH_SHORT).show()
             mostrarFavoritos()
         }
 
