@@ -8,8 +8,10 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.apptorneosajedrez.R
 
-class DestacadosAdapter(private val torneos: List<String>) :
-    RecyclerView.Adapter<DestacadosAdapter.DestacadoViewHolder>() {
+class DestacadosAdapter(
+    private val torneos: List<String>,
+    private val onEliminarFavorito: (String) -> Unit
+) : RecyclerView.Adapter<DestacadosAdapter.DestacadoViewHolder>() {
 
     inner class DestacadoViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val nombreTextView: TextView = itemView.findViewById(R.id.textNombreTorneo)
@@ -18,8 +20,11 @@ class DestacadosAdapter(private val torneos: List<String>) :
         fun bind(nombreTorneo: String) {
             nombreTextView.text = nombreTorneo
             estrellaImageView.setImageResource(R.drawable.ic_star2)
-            estrellaImageView.isEnabled = false
-            // TODO: ver esto para activar clicks en home
+
+            // Para sacar de favoritos
+            estrellaImageView.setOnClickListener {
+                onEliminarFavorito(nombreTorneo)
+            }
         }
     }
 

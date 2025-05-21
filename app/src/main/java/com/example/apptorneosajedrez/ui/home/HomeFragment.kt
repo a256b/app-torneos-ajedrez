@@ -30,12 +30,18 @@ class HomeFragment : Fragment() {
 
     private fun mostrarFavoritos() {
         val prefs = requireContext().getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
-        val favoritos = prefs.getStringSet(KEY_TORNEO_DESTACADO, emptySet())?.toList() ?: emptyList()
+        val favoritos = prefs.getStringSet(KEY_TORNEO_DESTACADO, emptySet())?.toMutableSet() ?: mutableSetOf()
 
-        val adapter = DestacadosAdapter(favoritos)
+        val adapter = DestacadosAdapter(favoritos.toList()) { torneo ->
+            favoritos.remove(torneo)
+            prefs.edit().putStringSet(KEY_TORNEO_DESTACADO, favoritos).apply()
+            mostrarFavoritos()
+        }
+
         binding.recyclerViewDestacados.layoutManager = LinearLayoutManager(requireContext())
         binding.recyclerViewDestacados.adapter = adapter
     }
+
 
     override fun onResume() {
         super.onResume()
