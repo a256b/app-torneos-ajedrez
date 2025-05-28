@@ -51,14 +51,15 @@
             android:id="@+id/imgEstrella"
             android:layout_width="24dp"
             android:layout_height="24dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
             android:layout_marginEnd="8dp"
             android:contentDescription="@string/estrella"
             android:clickable="true"
             android:focusable="true"
-            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:srcCompat="@drawable/ic_star" />
+
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>
