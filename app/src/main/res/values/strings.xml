@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">AppTorneosAjedrez</string>
+    <string name="navigation_drawer_open">Abrir navigation drawer</string>
+    <string name="navigation_drawer_close">Cerrar navigation drawer</string>
+    <string name="nav_header_title">Ajedrez - TNT</string>
+    <string name="nav_header_desc">Navigation header</string>
+    <string name="action_settings">Configuración</string>
+
+    <string name="menu_inicio">Inicio</string>
+    <string name="menu_torneos">Torneos</string>
+    <string name="menu_jugadores">Jugadores</string>
+    <string name="menu_inscripciones">Inscripciones</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="inscribirse">Inscribirse</string>
+    <string name="ver_partidas">Ver Partidas</string>
+    <string name="detalle_torneo">Detalle Torneo</string>
+    <string name="estrella">Estrella</string>
+</resources>
