@@ -5,15 +5,25 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.example.apptorneosajedrez.R
+import com.example.apptorneosajedrez.databinding.FragmentTorneoDetalleBinding
 
 class TorneoDetalleFragment : Fragment() {
+
+    private var _binding : FragmentTorneoDetalleBinding? = null
+    private val binding get() = _binding!!
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_torneo_detalle, container, false)
+        _binding = FragmentTorneoDetalleBinding.inflate(layoutInflater, container, false)
+        return binding.root
+    }
+
+
+    override fun onDestroy() {
+        super.onDestroy()
+        _binding = null
     }
 
 }
