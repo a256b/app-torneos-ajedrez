@@ -62,16 +62,15 @@ class TorneoAdapter(
 
     }
 
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TorneoViewHolder { // Método llamado cuando se necesita crear un nuevo ViewHolder
-        val view = LayoutInflater.from(parent.context) // Obtiene un inflador desde el contexto del parent
-            .inflate(R.layout.item_torneo, parent, false) // Infla el layout item_torneo.xml (crea la vista)
-        return TorneoViewHolder(view) // Devuelve un nuevo ViewHolder con la vista inflada
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TorneoViewHolder {
+        val view = LayoutInflater.from(parent.context)
+            .inflate(R.layout.item_torneo, parent, false)
+        return TorneoViewHolder(view)
     }
 
-    override fun onBindViewHolder(holder: TorneoViewHolder, position: Int) { // Método llamado para mostrar datos en la posición especificada
-        holder.bind(torneos[position]) // Llama al método bind del ViewHolder pasando el nombre del torneo en la posición actual
+    override fun onBindViewHolder(holder: TorneoViewHolder, position: Int) {
+        holder.bind(torneos[position])
     }
 
-    override fun getItemCount(): Int = torneos.size // Devuelve la cantidad total de elementos en la lista
+    override fun getItemCount(): Int = torneos.size
 }
