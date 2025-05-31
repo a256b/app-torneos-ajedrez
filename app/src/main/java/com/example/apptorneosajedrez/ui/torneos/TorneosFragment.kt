@@ -1,22 +1,20 @@
-package com.example.apptorneosajedrez.ui.torneos // Declaración del paquete donde se encuentra la clase
+package com.example.apptorneosajedrez.ui.torneos
 
-import androidx.fragment.app.viewModels // Importa la extensión para usar ViewModels en fragmentos
-import android.os.Bundle // Para manejar datos entre fragmentos y estados
-import androidx.fragment.app.Fragment // Clase base para fragmentos
-import android.view.LayoutInflater // Para inflar layouts
-import android.view.View // Para manejar vistas
-import android.view.ViewGroup // Contenedor de vistas
-import androidx.navigation.fragment.findNavController // Para obtener el controlador de navegación en fragmentos
-import com.example.apptorneosajedrez.R // Acceso a recursos
-import com.example.apptorneosajedrez.databinding.FragmentTorneosBinding // Binding para el fragmento de torneos
+import androidx.fragment.app.viewModels
+import android.os.Bundle
+import androidx.fragment.app.Fragment
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.navigation.fragment.findNavController
+import com.example.apptorneosajedrez.R
+import com.example.apptorneosajedrez.databinding.FragmentTorneosBinding
 
-class TorneosFragment : Fragment() { // Definición del fragmento para la lista de torneos
+class TorneosFragment : Fragment() {
 
-    // Variable para manejar el binding (patrón View Binding)
-    private var _binding: FragmentTorneosBinding? = null // Inicialmente nulo, se inicializa en onCreateView y se limpia en onDestroyView
-    private val binding get() = _binding!! // Propiedad de acceso para evitar verificaciones de nulidad repetidas
+    private var _binding: FragmentTorneosBinding? = null
+    private val binding get() = _binding!!
 
-    // Lista de torneos para mostrar (datos de ejemplo)
     private val torneos = listOf(
         "Torneo Abierto de Ajedrez Ciudad de Buenos Aires",
         "Memorial Miguel Najdorf",
@@ -27,55 +25,64 @@ class TorneosFragment : Fragment() { // Definición del fragmento para la lista 
         "Torneo Abierto de Ajedrez Córdoba Capital",
         "Gran Prix de Ajedrez Patagonia",
         "Torneo de Ajedrez Mendoza",
-        "Open de Ajedrez Rosario"
+        "Torneo Abierto de Ajedrez Ciudad de Buenos Aires",
+        "Memorial Miguel Najdorf",
+        "Campeonato Argentino de Ajedrez",
+        "Torneo Magistral de Mar del Plata",
+        "Copa Independencia de Ajedrez",
+        "Festival Internacional de Ajedrez de La Plata",
+        "Torneo Abierto de Ajedrez Córdoba Capital",
+        "Gran Prix de Ajedrez Patagonia",
+        "Torneo de Ajedrez Mendoza",
+        "Torneo Abierto de Ajedrez Ciudad de Buenos Aires",
+        "Memorial Miguel Najdorf",
+        "Campeonato Argentino de Ajedrez",
+        "Torneo Magistral de Mar del Plata",
+        "Copa Independencia de Ajedrez",
+        "Festival Internacional de Ajedrez de La Plata",
+        "Torneo Abierto de Ajedrez Córdoba Capital",
+        "Gran Prix de Ajedrez Patagonia",
+        "Torneo de Ajedrez Mendoza",
     )
 
-    companion object { // Objeto compañero para métodos estáticos del fragmento
-        fun newInstance() = TorneosFragment() // Método de fábrica para crear instancias del fragmento
+    companion object {
+        fun newInstance() = TorneosFragment()
     }
 
-    // Inicialización del ViewModel usando la extensión by viewModels()
     private val viewModel: TorneosViewModel by viewModels()
 
-    override fun onCreate(savedInstanceState: Bundle?) { // Método llamado cuando se crea el fragmento
-        super.onCreate(savedInstanceState) // Llama al método onCreate de la clase padre
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater, // Inflador para crear vistas
-        container: ViewGroup?, // Contenedor padre donde se agregará el fragmento
-        savedInstanceState: Bundle? // Estado guardado del fragmento
-    ): View { // Devuelve la vista raíz del fragmento
-        _binding = FragmentTorneosBinding.inflate(
-            inflater,
-            container,
-            false
-        ) // Infla el layout usando view binding
-        val root = binding.root // Obtiene la vista raíz del binding
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        _binding = FragmentTorneosBinding.inflate(inflater, container, false)
+        val root = binding.root
 
-        // Crea el adaptador con la lista de torneos y un lambda para manejar clicks
         val adapter = TorneoAdapter(torneos, requireContext()) { nombreTorneo ->
-            navegarADetalleTorneo(nombreTorneo) // Cuando se hace click, navega al detalle
+            navegarADetalleTorneo(nombreTorneo)
         }
-        binding.recyclerViewTorneos.adapter = adapter // Asigna el adaptador al RecyclerView
+        binding.recyclerViewTorneos.adapter = adapter
 
-        return root // Devuelve la vista raíz
-
+        return root
     }
 
-    // Método para navegar al fragmento de detalle del torneo
     private fun navegarADetalleTorneo(nombreTorneo: String) {
-        val bundle = Bundle().apply { // Crea un bundle para pasar datos
-            putString("nombreTorneo", nombreTorneo) // Agrega el nombre del torneo al bundle
+        val bundle = Bundle().apply {
+            putString("nombreTorneo", nombreTorneo)
         }
-        findNavController().navigate( // Utiliza el controlador de navegación para navegar
-            R.id.action_nav_torneos_to_nuevoTorneoFragment2, // ID de la acción definida en el gráfico de navegación
-            bundle // Pasa el bundle con los datos
+        findNavController().navigate(
+            R.id.action_nav_torneos_to_nuevoTorneoFragment,
+            bundle
         )
     }
 
-    override fun onDestroyView() { // Método llamado cuando se destruye la vista del fragmento
-        super.onDestroyView() // Llama al método onDestroyView de la clase padre
-        _binding = null // Limpia la referencia al binding para evitar fugas de memoria
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }
