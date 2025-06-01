@@ -19,10 +19,6 @@ class TorneosFragment : Fragment() {
     private val viewModel: TorneoViewModel by viewModels()
     private var torneosList: List<String> = emptyList()
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -30,7 +26,7 @@ class TorneosFragment : Fragment() {
     ): View {
         _binding = FragmentTorneosBinding.inflate(inflater, container, false)
 
-        viewModel.torneos.observe(viewLifecycleOwner, Observer { lista ->
+        viewModel.torneos.observe(viewLifecycleOwner, { lista ->
             torneosList = lista.map { it.nombre }
             setupRecyclerView()
         })
@@ -61,7 +57,4 @@ class TorneosFragment : Fragment() {
         _binding = null
     }
 
-    companion object {
-        fun newInstance() = TorneosFragment()
-    }
 }
