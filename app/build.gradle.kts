@@ -15,8 +15,11 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        // Leer la key desde local.properties
+        val apiKey = project.findProperty("MAPS_API_KEY") as? String ?: ""
+        manifestPlaceholders["MAPS_API_KEY"] = apiKey
     }
-
+    
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -54,4 +57,5 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+    implementation(libs.play.services.maps)
 }
