@@ -1,3 +1,19 @@
+import java.util.Properties
+import java.io.FileInputStream
+
+fun getLocalProperty(key: String): String? {
+    val properties = Properties()
+    val localPropertiesFile = rootProject.file("local.properties")
+    if (localPropertiesFile.exists()) {
+        FileInputStream(localPropertiesFile).use { fis ->
+            properties.load(fis)
+        }
+        return properties.getProperty(key)
+    }
+    return null
+}
+
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -15,9 +31,8 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        // Leer la key desde local.properties
-        val apiKey = project.findProperty("MAPS_API_KEY") as? String ?: ""
-        manifestPlaceholders["MAPS_API_KEY"] = apiKey
+        // Leer la key manualmente y pasarla a manifestPlaceholders
+        manifestPlaceholders["MAPS_API_KEY"] = getLocalProperty("MAPS_API_KEY") ?: ""
     }
     
     buildTypes {
