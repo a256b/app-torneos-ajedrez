@@ -20,6 +20,9 @@
             android:id="@+id/nav_inscripciones"
             android:icon="@drawable/ic_lapiz"
             android:title="@string/menu_inscripciones" />
-
+        <item
+            android:id="@+id/nav_mapa"
+            android:icon="@drawable/ic_image"
+            android:title="@string/menu_mapa" />
     </group>
 </menu>

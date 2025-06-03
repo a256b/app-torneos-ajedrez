@@ -12,6 +12,9 @@ import androidx.drawerlayout.widget.DrawerLayout // Para el panel lateral desliz
 import androidx.appcompat.app.AppCompatActivity // Actividad base con características de AppCompat
 import androidx.navigation.fragment.NavHostFragment // Fragmento contenedor para la navegación
 import com.example.apptorneosajedrez.databinding.ActivityMainBinding // Binding generado para el layout de la actividad principal
+import android.content.Intent
+import com.example.apptorneosajedrez.ui.mapa.MapaActivity
+import androidx.navigation.ui.NavigationUI
 
 class MainActivity : AppCompatActivity() { // Definición de la clase principal que hereda de AppCompatActivity
 
@@ -38,7 +41,7 @@ class MainActivity : AppCompatActivity() { // Definición de la clase principal 
             // Configura la AppBarConfiguration con los destinos de nivel superior (que mostrarán el ícono del drawer)
             appBarConfiguration = AppBarConfiguration(
                 setOf(
-                    R.id.nav_home, R.id.nav_torneos, R.id.nav_jugadores, R.id.nav_inscripciones
+                    R.id.nav_home, R.id.nav_torneos, R.id.nav_jugadores, R.id.nav_inscripciones, R.id.nav_mapa
                 ), drawerLayout
             )
 
@@ -47,6 +50,21 @@ class MainActivity : AppCompatActivity() { // Definición de la clase principal 
 
             // Configura la vista de navegación con el controlador de navegación
             navView.setupWithNavController(navController)
+            navView.setNavigationItemSelectedListener { menuItem ->
+                if (menuItem.itemId == R.id.nav_mapa) {
+                    // Abrir SecondActivity manualmente
+                    val intent = Intent(this, MapaActivity::class.java)
+                    startActivity(intent)
+                    binding.drawerLayout.closeDrawers()
+                    true
+                } else {
+                    // Dejar que NavigationUI maneje los demás
+                    val handled = NavigationUI.onNavDestinationSelected(menuItem, navController)
+                    if (handled) binding.drawerLayout.closeDrawers()
+                    handled
+                }
+            }
+
         }
     }
 
