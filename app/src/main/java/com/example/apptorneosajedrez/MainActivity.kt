@@ -14,9 +14,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import com.example.apptorneosajedrez.databinding.ActivityMainBinding
-import android.content.Intent
-import com.example.apptorneosajedrez.ui.mapa.MapaActivity
-import androidx.navigation.ui.NavigationUI
+
 
 class MainActivity : AppCompatActivity() {
 
@@ -61,21 +59,6 @@ class MainActivity : AppCompatActivity() {
         setupAppBarConfiguration(drawerLayout)
         connectActionBarWithNavigation(navController)
         connectDrawerWithNavigation(navigationView, navController)
-
-        navigationView.setNavigationItemSelectedListener { menuItem ->
-            if (menuItem.itemId == R.id.nav_mapa) {
-                // Abrir SecondActivity manualmente
-                val intent = Intent(this, MapaActivity::class.java)
-                startActivity(intent)
-                binding.drawerLayout.closeDrawers()
-                true
-            } else {
-                // Dejar que NavigationUI maneje los demás
-                val handled = NavigationUI.onNavDestinationSelected(menuItem, navController)
-                if (handled) binding.drawerLayout.closeDrawers()
-                handled
-            }
-        }
     }
 
     private fun setupAppBarConfiguration(drawerLayout: DrawerLayout) {
@@ -99,7 +82,10 @@ class MainActivity : AppCompatActivity() {
         setupActionBarWithNavController(navController, appBarConfiguration)
     }
 
-    private fun connectDrawerWithNavigation(navigationView: NavigationView, navController: NavController) {
+    private fun connectDrawerWithNavigation(
+        navigationView: NavigationView,
+        navController: NavController
+    ) {
         navigationView.setupWithNavController(navController)
     }
 

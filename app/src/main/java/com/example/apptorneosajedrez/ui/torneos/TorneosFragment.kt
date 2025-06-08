@@ -20,9 +20,7 @@ class TorneosFragment : Fragment() {
     private var torneosList: List<String> = emptyList()
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
         _binding = FragmentTorneosBinding.inflate(inflater, container, false)
 
@@ -47,8 +45,7 @@ class TorneosFragment : Fragment() {
             putString("nombreTorneo", nombreTorneo)
         }
         findNavController().navigate(
-            R.id.action_nav_torneos_to_nuevoTorneoFragment,
-            args
+            R.id.action_nav_torneos_to_nuevoTorneoFragment, args
         )
     }
 
