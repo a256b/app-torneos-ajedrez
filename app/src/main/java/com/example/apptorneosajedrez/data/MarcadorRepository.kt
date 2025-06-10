@@ -14,8 +14,7 @@ class MarcadorRepository {
      * Llama a [cuandoCambia] cada vez que cambia el listado de marcadores.
      */
     fun escucharMarcadores(cuandoCambia: (List<Marcador>) -> Unit): ListenerRegistration {
-        return db.collection("marcadores")
-            .addSnapshotListener { snapshot, error ->
+        return db.collection("marcadores").addSnapshotListener { snapshot, error ->
                 /**
                  * Si hay un error o no se recibió snapshot, se llama a [cuandoCambia] con
                  * una lista vacía.
@@ -39,4 +38,14 @@ class MarcadorRepository {
                 cuandoCambia(lista)
             }
     }
+
+    fun agregarMarcador(marcador: Marcador, onComplete: (Boolean) -> Unit) {
+        val docRef = db.collection("marcadores").document()
+        val marcadorConId = marcador.copy(id = docRef.id)
+
+        docRef.set(marcadorConId).addOnSuccessListener { onComplete(true) }
+            .addOnFailureListener { onComplete(false) }
+    }
+
+
 }

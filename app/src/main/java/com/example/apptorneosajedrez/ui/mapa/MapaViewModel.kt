@@ -25,5 +25,10 @@ class MapaViewModel : ViewModel() {
         super.onCleared()
         listener?.remove()
     }
+
+    fun agregarMarcador(marcador: Marcador, onComplete: (Boolean) -> Unit) {
+        repositorio.agregarMarcador(marcador, onComplete)
+    }
+
 }
 
