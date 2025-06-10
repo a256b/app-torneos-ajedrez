@@ -1,6 +1,6 @@
 package com.example.apptorneosajedrez.model
 
-data class TorneoModel(
+data class Torneo(
     val idTorneo: Int,
     val nombre: String,
     val descripcion: String,

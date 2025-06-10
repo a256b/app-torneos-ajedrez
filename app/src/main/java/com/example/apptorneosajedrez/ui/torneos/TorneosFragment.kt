@@ -6,10 +6,10 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import com.example.apptorneosajedrez.R
 import com.example.apptorneosajedrez.databinding.FragmentTorneosBinding
+import com.example.apptorneosajedrez.model.Torneo
 
 class TorneosFragment : Fragment() {
 
@@ -23,14 +23,23 @@ class TorneosFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
         _binding = FragmentTorneosBinding.inflate(inflater, container, false)
-
-        viewModel.torneos.observe(viewLifecycleOwner, { lista ->
-            torneosList = lista.map { it.nombre }
-            setupRecyclerView()
-        })
-
-        viewModel.cargarTorneos()
         return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        observarTorneos()
+    }
+
+    private fun observarTorneos() {
+        viewModel.torneos.observe(viewLifecycleOwner) { lista ->
+            actualizarListaTorneos(lista)
+            setupRecyclerView()
+        }
+    }
+
+    private fun actualizarListaTorneos(lista: List<Torneo>) {
+        torneosList = lista.map { it.nombre }
     }
 
     private fun setupRecyclerView() {
