@@ -6,7 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import com.example.apptorneosajedrez.R
+import com.example.apptorneosajedrez.databinding.FragmentMapaBinding
 import com.example.apptorneosajedrez.model.Marcador
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -18,12 +18,18 @@ import com.google.android.gms.maps.model.MarkerOptions
 
 class MapaFragment : Fragment(), OnMapReadyCallback {
 
+    private var _binding: FragmentMapaBinding? = null
+    private val binding get() = _binding!!
+
     private lateinit var googleMap: GoogleMap
     private val viewModel: MapaViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
-    ): View = inflater.inflate(R.layout.fragment_mapa, container, false)
+    ): View {
+        _binding = FragmentMapaBinding.inflate(inflater, container, false)
+        return binding.root
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -33,7 +39,7 @@ class MapaFragment : Fragment(), OnMapReadyCallback {
 
     private fun inicializarMapa() {
         val mapFragment =
-            childFragmentManager.findFragmentById(R.id.nav_mapa) as? SupportMapFragment
+            childFragmentManager.findFragmentById(binding.navMapa.id) as? SupportMapFragment
         mapFragment?.getMapAsync(this)
     }
 
@@ -55,7 +61,7 @@ class MapaFragment : Fragment(), OnMapReadyCallback {
             googleMap.addMarker(options)
         }
 
-        centrarCamaraEnPrimerMarcador(marcadores)
+       centrarCamaraEnPrimerMarcador(marcadores)
     }
 
     private fun centrarCamaraEnPrimerMarcador(marcadores: List<Marcador>) {
@@ -66,5 +72,10 @@ class MapaFragment : Fragment(), OnMapReadyCallback {
 
     override fun onMapReady(map: GoogleMap) {
         googleMap = map
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }
