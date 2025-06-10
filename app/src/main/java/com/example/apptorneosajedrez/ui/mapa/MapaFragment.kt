@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.example.apptorneosajedrez.R
+import com.example.apptorneosajedrez.model.Marcador
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -17,41 +18,53 @@ import com.google.android.gms.maps.model.MarkerOptions
 
 class MapaFragment : Fragment(), OnMapReadyCallback {
 
-
-    private lateinit var map: GoogleMap
+    private lateinit var googleMap: GoogleMap
     private val viewModel: MapaViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.fragment_mapa, container, false)
-    }
+    ): View = inflater.inflate(R.layout.fragment_mapa, container, false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val mapaFragment =
-            childFragmentManager.findFragmentById(R.id.nav_mapa) as? SupportMapFragment
-        mapaFragment?.getMapAsync(this)
+        inicializarMapa()
         observarMarcadores()
     }
 
+    private fun inicializarMapa() {
+        val mapFragment =
+            childFragmentManager.findFragmentById(R.id.nav_mapa) as? SupportMapFragment
+        mapFragment?.getMapAsync(this)
+    }
+
     private fun observarMarcadores() {
-        viewModel.marcadores.observe(viewLifecycleOwner) { lista ->
-            if (::map.isInitialized) {
-                map.clear()
-                lista.forEach { marcador ->
-                    val posicion = LatLng(marcador.latitud, marcador.longitud)
-                    map.addMarker(MarkerOptions().position(posicion).title(marcador.nombre))
-                }
-                if (lista.isNotEmpty()) {
-                    val first = LatLng(lista[0].latitud, lista[0].longitud)
-                    map.moveCamera(CameraUpdateFactory.newLatLngZoom(first, 12f))
-                }
+        viewModel.marcadores.observe(viewLifecycleOwner) { marcadores ->
+            if (::googleMap.isInitialized) {
+                mostrarMarcadoresEnMapa(marcadores)
             }
         }
     }
 
-    override fun onMapReady(googleMap: GoogleMap) {
-        map = googleMap
+    private fun mostrarMarcadoresEnMapa(marcadores: List<Marcador>) {
+        googleMap.clear()
+
+        for (marcador in marcadores) {
+            val posicion = LatLng(marcador.latitud, marcador.longitud)
+            val options = MarkerOptions().position(posicion).title(marcador.nombre)
+
+            googleMap.addMarker(options)
+        }
+
+        centrarCamaraEnPrimerMarcador(marcadores)
+    }
+
+    private fun centrarCamaraEnPrimerMarcador(marcadores: List<Marcador>) {
+        if (marcadores.isEmpty()) return
+        val primerMarcador = LatLng(marcadores[0].latitud, marcadores[0].longitud)
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(primerMarcador, 12f))
+    }
+
+    override fun onMapReady(map: GoogleMap) {
+        googleMap = map
     }
 }
