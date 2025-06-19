@@ -5,7 +5,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
 import android.widget.EditText
+import android.widget.Spinner
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -18,6 +20,8 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.example.apptorneosajedrez.R
+import com.example.apptorneosajedrez.model.Categoria
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 
 
 class MapaFragment : Fragment(), OnMapReadyCallback {
@@ -68,7 +72,16 @@ class MapaFragment : Fragment(), OnMapReadyCallback {
 
         for (marcador in marcadores) {
             val posicion = LatLng(marcador.latitud, marcador.longitud)
-            val options = MarkerOptions().position(posicion).title(marcador.nombre)
+
+            val color = when (marcador.categoria) {
+                Categoria.TORNEO -> BitmapDescriptorFactory.HUE_RED
+                Categoria.COMERCIO -> BitmapDescriptorFactory.HUE_BLUE
+            }
+
+            val options = MarkerOptions()
+                .position(posicion)
+                .title(marcador.nombre)
+                .icon(BitmapDescriptorFactory.defaultMarker(color))
 
             googleMap.addMarker(options)
         }
@@ -88,24 +101,42 @@ class MapaFragment : Fragment(), OnMapReadyCallback {
             LayoutInflater.from(requireContext()).inflate(R.layout.dialog_agregar_marcador, null)
 
         val inputNombre = dialogView.findViewById<EditText>(R.id.editTextNombre)
+        val spinnerCategoria = dialogView.findViewById<Spinner>(R.id.spinnerCategoria)
 
-        AlertDialog.Builder(requireContext()).setTitle("Nuevo marcador").setView(dialogView)
+        val categorias = Categoria.values()
+        val adapter = ArrayAdapter(
+            requireContext(),
+            android.R.layout.simple_spinner_item,
+            categorias.map { it.name.lowercase().replaceFirstChar(Char::titlecase) } // "Torneo", "Comercio"
+        )
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        spinnerCategoria.adapter = adapter
+
+        AlertDialog.Builder(requireContext())
+            .setTitle("Nuevo marcador")
+            .setView(dialogView)
             .setPositiveButton("Guardar") { _, _ ->
                 val nombre = inputNombre.text.toString().trim()
+                val categoriaSeleccionada = categorias[spinnerCategoria.selectedItemPosition]
+
                 if (nombre.isNotEmpty()) {
-                    guardarMarcador(nombre, latLng)
+                    guardarMarcador(nombre, latLng, categoriaSeleccionada)
                 } else {
                     Toast.makeText(
-                        requireContext(), "El nombre no puede estar vacío", Toast.LENGTH_SHORT
+                        requireContext(),
+                        "El nombre no puede estar vacío",
+                        Toast.LENGTH_SHORT
                     ).show()
                 }
-            }.setNegativeButton("Cancelar", null).show()
+            }
+            .setNegativeButton("Cancelar", null)
+            .show()
     }
 
 
-    private fun guardarMarcador(nombre: String, latLng: LatLng) {
+    private fun guardarMarcador(nombre: String, latLng: LatLng, categoriaSeleccionada: Categoria) {
         val marcador = Marcador(
-            nombre = nombre, latitud = latLng.latitude, longitud = latLng.longitude
+            nombre = nombre, latitud = latLng.latitude, longitud = latLng.longitude, categoria = categoriaSeleccionada
         )
 
         viewModel.agregarMarcador(marcador) { exito ->

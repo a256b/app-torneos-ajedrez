@@ -229,6 +229,12 @@ crashlytics.properties
 crashlytics-build.properties
 fabric.properties
 
+# Firebase
+app/google-services.json
+
+# Gradle generated files
+/build
+
 ### AndroidStudio Patch ###
 
 !/gradle/wrapper/gradle-wrapper.jar
