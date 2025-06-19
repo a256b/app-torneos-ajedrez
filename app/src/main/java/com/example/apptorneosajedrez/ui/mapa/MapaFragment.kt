@@ -49,6 +49,17 @@ class MapaFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+
+        if (::googleMap.isInitialized) {
+            val marcadoresActuales = viewModel.marcadores.value
+            if (marcadoresActuales != null) {
+                mostrarMarcadoresEnMapa(marcadoresActuales)
+            }
+        }
+    }
+
     private fun inicializarMapa() {
         val mapFragment =
             childFragmentManager.findFragmentById(binding.navMapa.id) as? SupportMapFragment
@@ -62,6 +73,8 @@ class MapaFragment : Fragment(), OnMapReadyCallback {
             }
         }
     }
+
+
 
     private fun mostrarMarcadoresEnMapa(marcadores: List<Marcador>) {
         googleMap.clear()
