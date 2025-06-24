@@ -20,8 +20,8 @@
             android:layout_width="64dp"
             android:layout_height="64dp"
             app:srcCompat="@drawable/ic_lapiz"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <LinearLayout
             android:id="@+id/contenedorTexto"
@@ -42,6 +42,17 @@
                 android:textSize="18sp"
                 android:textStyle="bold"
                 android:maxLines="2"
+                android:ellipsize="end" />
+
+            <TextView
+                android:id="@+id/textNombreTorneo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Torneo"
+                android:textSize="14sp"
+                android:textColor="#555555"
+                android:layout_marginTop="4dp"
+                android:maxLines="1"
                 android:ellipsize="end" />
         </LinearLayout>
 

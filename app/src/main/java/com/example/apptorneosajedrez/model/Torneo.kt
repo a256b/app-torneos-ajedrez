@@ -9,4 +9,3 @@ data class Torneo(
     val horaInicio: String = "",
     val ubicacion: String = ""
 )
-

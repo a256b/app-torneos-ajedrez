@@ -16,20 +16,38 @@ class JugadorRepository {
                     return@addSnapshotListener
                 }
 
-                val jugadores = snapshot.documents.mapNotNull {
-                    it.toObject<Jugador>()?.copy(id = it.id)
+                val jugadores = snapshot.documents.mapNotNull { doc ->
+                    val jugador = doc.toObject<Jugador>()
+                    // Usar el campo 'id' cargado manualmente, no el document.id
+                    if (jugador != null && jugador.id.isNotBlank()) {
+                        jugador
+                    } else {
+                        null
+                    }
                 }
                 onChange(jugadores)
             }
     }
 
-
     fun actualizarEstadoJugador(id: String, nuevoEstado: String) {
-        db.collection("jugadores").document(id)
-            .update("estado", nuevoEstado)
+        db.collection("jugadores")
+            .whereEqualTo("id", id)
+            .get()
+            .addOnSuccessListener { result ->
+                for (doc in result) {
+                    doc.reference.update("estado", nuevoEstado)
+                }
+            }
     }
 
     fun eliminarJugador(id: String) {
-        db.collection("jugadores").document(id).delete()
+        db.collection("jugadores")
+            .whereEqualTo("id", id)
+            .get()
+            .addOnSuccessListener { result ->
+                for (doc in result) {
+                    doc.reference.delete()
+                }
+            }
     }
 }

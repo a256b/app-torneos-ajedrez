@@ -1,44 +1,58 @@
 package com.example.apptorneosajedrez.ui.inscripciones
 
-import androidx.fragment.app.viewModels
 import android.os.Bundle
-import androidx.fragment.app.Fragment
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
+import com.example.apptorneosajedrez.data.InscripcionRepository
+import com.example.apptorneosajedrez.data.JugadorRepository
+import com.example.apptorneosajedrez.data.TorneoRepository
 import com.example.apptorneosajedrez.databinding.FragmentInscripcionesBinding
+import com.example.apptorneosajedrez.model.Jugador
+import com.example.apptorneosajedrez.model.Torneo
 
 class InscripcionesFragment : Fragment() {
 
     private var _binding: FragmentInscripcionesBinding? = null
     private val binding get() = _binding!!
-
-    private val inscriptos = listOf(
-        "Juan Pérez",
-        "Ana González",
-        "David Martínez",
-        "Sofia García",
-        "Carlos Rodríguez",
-        "Lucía López",
-        "Miguel Sánchez",
-        "Isabel Hernández",
-        "Andrés Díaz",
-        "Elsa Romero"
-    )
-
-    private val viewModel: InscripcionesViewModel by viewModels()
+    private val repoInscripciones = InscripcionRepository()
+    private val repoJugadores = JugadorRepository()
+    private val repoTorneos = TorneoRepository()
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
         _binding = FragmentInscripcionesBinding.inflate(inflater, container, false)
-        val root = binding.root
+        return binding.root
+    }
 
-        val adapter = InscripcionAdapter(inscriptos)
-        binding.recyclerViewInscripciones.adapter = adapter
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
-        return root
+        repoJugadores.escucharJugadores { listaJugadores ->
+            val jugadoresMap = listaJugadores.associateBy { it.id }
+
+            repoTorneos.escucharTorneos { listaTorneos ->
+                val torneosMap = listaTorneos.associateBy { it.idTorneo }
+
+                repoInscripciones.escucharInscripciones { listaInscripciones ->
+                    val inscripcionesInfo = listaInscripciones.map { inscripcion ->
+                        val jugadorNombre = jugadoresMap[inscripcion.idJugador]?.nombre
+                            ?: "Jugador eliminado (id: ${inscripcion.idJugador})"
+
+                        val torneoNombre = torneosMap[inscripcion.idTorneo.toIntOrNull()]?.nombre
+                            ?: "Torneo eliminado (id: ${inscripcion.idTorneo})"
+
+                        InscripcionInfo(jugadorNombre, torneoNombre)
+                    }
+
+                    val adapter = InscripcionAdapter(inscripcionesInfo)
+                    binding.recyclerViewInscripciones.adapter = adapter
+                }
+            }
+        }
     }
 
     override fun onDestroyView() {

@@ -7,14 +7,21 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.apptorneosajedrez.R
 
-class InscripcionAdapter(private val inscriptos: List<String>) :
+data class InscripcionInfo(
+    val nombreJugador: String,
+    val nombreTorneo: String
+)
+
+class InscripcionAdapter(private val inscripciones: List<InscripcionInfo>) :
     RecyclerView.Adapter<InscripcionAdapter.InscripcionViewHolder>() {
 
     class InscripcionViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val nombreTextView: TextView = itemView.findViewById(R.id.textNombreInscripto)
+        private val nombreJugadorTextView: TextView = itemView.findViewById(R.id.textNombreInscripto)
+        private val nombreTorneoTextView: TextView = itemView.findViewById(R.id.textNombreTorneo)
 
-        fun bind(nombre: String) {
-            nombreTextView.text = nombre
+        fun bind(info: InscripcionInfo) {
+            nombreJugadorTextView.text = info.nombreJugador
+            nombreTorneoTextView.text = info.nombreTorneo
         }
     }
 
@@ -25,8 +32,8 @@ class InscripcionAdapter(private val inscriptos: List<String>) :
     }
 
     override fun onBindViewHolder(holder: InscripcionViewHolder, position: Int) {
-        holder.bind(inscriptos[position])
+        holder.bind(inscripciones[position])
     }
 
-    override fun getItemCount(): Int = inscriptos.size
+    override fun getItemCount(): Int = inscripciones.size
 }
