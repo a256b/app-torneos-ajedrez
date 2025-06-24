@@ -14,21 +14,20 @@
             android:id="@+id/nombre_torneo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:textSize="24sp"
-            tools:text="Nombre del Torneo"
             android:layout_gravity="center_horizontal"
-            android:textStyle="bold" />
+            android:layout_marginTop="12dp"
+            android:textSize="32sp"
+            android:textStyle="bold"
+            tools:text="Título del torneo" />
 
         <ImageView
             android:id="@+id/iv_torneo"
             android:layout_width="358dp"
-            android:layout_height="318dp"
+            android:layout_height="285dp"
+            android:layout_gravity="center_horizontal"
             android:layout_marginTop="32dp"
             android:scaleType="centerCrop"
-            android:layout_gravity="center_horizontal"
-            android:src="@drawable/logo_caballo_negro"
-            />
+            android:src="@drawable/logo_caballo_negro" />
 
         <TextView
             android:id="@+id/tv_fecha_inicio"
@@ -37,8 +36,8 @@
             android:layout_marginTop="8dp"
             android:fontFamily="sans-serif-black"
             android:layout_gravity="center_horizontal"
-            tools:text="10 de Julio de 2025"
-            android:textSize="16sp" />
+            android:textSize="16sp"
+            tools:text="Fecha de inicio"/>
 
         <TextView
             android:id="@+id/tv_fecha_fin"
@@ -47,29 +46,56 @@
             android:layout_marginTop="8dp"
             android:fontFamily="sans-serif-black"
             android:layout_gravity="center_horizontal"
-            tools:text="11 de Julio de 2025"
-            android:textSize="16sp" />
+            android:textSize="16sp"
+            tools:text="Fecha de fin"/>
+
+        <TextView
+            android:id="@+id/tv_hora_inicio"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:fontFamily="sans-serif-black"
+            android:layout_gravity="center_horizontal"
+            android:textSize="16sp"
+            tools:text="Hora de inicio"/>
 
         <TextView
             android:id="@+id/tv_descripcion"
-            android:layout_width="360dp"
-            android:layout_height="65dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:layout_marginTop="24dp"
-            tools:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec accumsan est non tortor efficitur, vel blandit erat tincidunt. Aenean hendrerit sem vitae lectus facilisis sagittis lacinia a tellus. " />
+            android:fontFamily="sans-serif-black"
+            android:layout_marginTop="8dp"
+            android:textSize="16sp"
+            tools:text="Descripción del torneo"/>
+
+        <TextView
+            android:id="@+id/tv_ubicacion"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:fontFamily="sans-serif-black"
+            android:layout_gravity="center_horizontal"
+            android:textSize="16sp"
+            tools:text="Calle falsa 123"/>
+
+        <TextView
+            android:id="@+id/tv_cantidad_inscriptos"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="50dp"
+            android:layout_gravity="center_horizontal"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            tools:text="Cantidad de inscriptos"/>
 
         <Button
             android:id="@+id/btn_ver_partidas"
+            android:layout_marginTop="50dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:text="Ver partidas" />
 
-        <Button
-            android:id="@+id/btn_inscribirse"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:text="Inscribirse" />
     </LinearLayout>
 </ScrollView>
