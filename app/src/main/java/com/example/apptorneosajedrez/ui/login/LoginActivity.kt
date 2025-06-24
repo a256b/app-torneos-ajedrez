@@ -99,15 +99,14 @@ class LoginActivity : AppCompatActivity() {
     private fun updateUiWithUser(model: LoggedInUserView) {
         val welcome = getString(R.string.welcome)
         Toast.makeText(
-            applicationContext,
-            "$welcome ${model.displayName}",
-            Toast.LENGTH_LONG
+            applicationContext, "$welcome ${model.displayName}", Toast.LENGTH_LONG
         ).show()
         startActivity(Intent(this, MainActivity::class.java))
     }
 
     private fun showLoginFailed(@StringRes errorRes: Int) {
         Toast.makeText(applicationContext, errorRes, Toast.LENGTH_SHORT).show()
+        startActivity(Intent(this, LoginActivity::class.java))
     }
 }
 
