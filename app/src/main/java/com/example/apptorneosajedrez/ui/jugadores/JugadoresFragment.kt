@@ -31,17 +31,30 @@ class JugadoresFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         listenerRegistration = repo.escucharJugadores { jugadores ->
-            _binding?.let { binding ->
-                listaJugadores = jugadores.filter { it.estado == "pendiente" }
-                adapter = JugadorAdapter(
-                    listaJugadores,
-                    onAceptarClick = { jugador -> repo.actualizarEstadoJugador(jugador.id, "aceptado") },
-                    onRechazarClick = { jugador -> repo.eliminarJugador(jugador.id) }
-                )
-                binding.recyclerViewJugadores.adapter = adapter
+
+            val pendientes = jugadores.filter { it.estado == "pendiente" }
+            val aceptados = jugadores.filter { it.estado == "aceptado" }
+
+            val items = mutableListOf<JugadorItem>()
+            if (pendientes.isNotEmpty()) {
+                items.add(JugadorItem.Header("Jugadores pendientes (${pendientes.size})"))
+                items.addAll(pendientes.map { JugadorItem.JugadorData(it) })
             }
+
+            if (aceptados.isNotEmpty()) {
+                items.add(JugadorItem.Header("Jugadores aceptados (${aceptados.size})"))
+                items.addAll(aceptados.map { JugadorItem.JugadorData(it) })
+            }
+
+            adapter = JugadorAdapter(
+                items,
+                onAceptarClick = { jugador -> repo.actualizarEstadoJugador(jugador.id, "aceptado") },
+                onRechazarClick = { jugador -> repo.eliminarJugador(jugador.id) }
+            )
+            binding.recyclerViewJugadores.adapter = adapter
         }
     }
+
 
     override fun onDestroyView() {
         super.onDestroyView()

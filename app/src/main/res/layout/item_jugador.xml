@@ -62,7 +62,8 @@
                 android:id="@+id/btnRechazar"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Rechazar" />
+                android:text="Rechazar"
+                android:backgroundTint="@color/rojo"/>
         </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
