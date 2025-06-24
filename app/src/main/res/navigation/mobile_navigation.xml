@@ -48,7 +48,11 @@
         android:name="com.example.apptorneosajedrez.ui.torneos.TorneoDetalleFragment"
         android:label="@string/detalle_torneo"
         tools:layout="@layout/fragment_torneo_detalle" />
-
+    <activity
+        android:id="@+id/loginActivity"
+        android:name="com.example.apptorneosajedrez.ui.login.LoginActivity"
+        android:label="activity_login"
+        tools:layout="@layout/activity_login" />
 
 
 </navigation>
