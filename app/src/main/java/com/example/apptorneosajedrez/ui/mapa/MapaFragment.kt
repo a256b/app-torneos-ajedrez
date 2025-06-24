@@ -43,6 +43,9 @@ class MapaFragment : Fragment(), OnMapReadyCallback {
         super.onViewCreated(view, savedInstanceState)
         inicializarMapa()
         observarMarcadores()
+        binding.btnFiltro.setOnClickListener {
+            mostrarDialogoFiltro()
+        }
     }
 
 
@@ -158,6 +161,44 @@ class MapaFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
+    private fun mostrarDialogoFiltro() {
+        val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_filtro_mapa, null)
+
+        val spinnerCategoria = dialogView.findViewById<Spinner>(R.id.spinnerCategoriaFiltro)
+        val inputNombre = dialogView.findViewById<EditText>(R.id.editTextNombreFiltro)
+
+        val categorias = listOf("Todas") + Categoria.values().map {
+            it.name.lowercase().replaceFirstChar(Char::titlecase)
+        }
+
+        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, categorias)
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        spinnerCategoria.adapter = adapter
+
+        AlertDialog.Builder(requireContext())
+            .setTitle("Filtrar marcadores")
+            .setView(dialogView)
+            .setPositiveButton("Filtrar") { _, _ ->
+                val nombreFiltro = inputNombre.text.toString().trim()
+                val categoriaSeleccionada = spinnerCategoria.selectedItem.toString()
+
+                aplicarFiltro(nombreFiltro, categoriaSeleccionada)
+            }
+            .setNegativeButton("Cancelar", null)
+            .show()
+    }
+
+    private fun aplicarFiltro(nombre: String, categoria: String) {
+        val todos = viewModel.marcadores.value ?: return
+
+        val filtrados = todos.filter { marcador ->
+            val coincideNombre = nombre.isEmpty() || marcador.nombre.contains(nombre, ignoreCase = true)
+            val coincideCategoria = categoria == "Todas" || marcador.categoria.name.equals(categoria.uppercase(), ignoreCase = true)
+            coincideNombre && coincideCategoria
+        }
+
+        mostrarMarcadoresEnMapa(filtrados)
+    }
 
     override fun onDestroyView() {
         super.onDestroyView()

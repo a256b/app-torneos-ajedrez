@@ -16,4 +16,5 @@
     <string name="ver_partidas">Ver Partidas</string>
     <string name="detalle_torneo">Detalle Torneo</string>
     <string name="estrella">Estrella</string>
+    <string name="filtro">Filtro</string>
 </resources>
