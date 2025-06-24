@@ -1,46 +1,42 @@
 package com.example.apptorneosajedrez.data
 
 import com.example.apptorneosajedrez.data.model.LoggedInUser
+import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.tasks.await
 
-/**
- * Class that requests authentication and user information from the remote data source and
- * maintains an in-memory cache of login status and user credentials information.
- */
+class LoginRepository(
+    private val firebaseAuth: FirebaseAuth = FirebaseAuth.getInstance()
+) {
 
-class LoginRepository(val dataSource: LoginDataSource) {
-
-    // in-memory cache of the loggedInUser object
-    var user: LoggedInUser? = null
+    var user: LoggedInUser? = firebaseAuth.currentUser?.toLoggedInUser()
         private set
 
     val isLoggedIn: Boolean
-        get() = user != null
+        get() = firebaseAuth.currentUser != null
 
-    init {
-        // If user credentials will be cached in local storage, it is recommended it be encrypted
-        // @see https://developer.android.com/training/articles/keystore
-        user = null
+    suspend fun login(email: String, password: String): Result<LoggedInUser> {
+        return try {
+            val authResult = firebaseAuth
+                .signInWithEmailAndPassword(email, password)
+                .await()
+            val fUser = authResult.user
+                ?: throw Exception("Usuario nulo tras autenticación")
+            val loggedInUser = fUser.toLoggedInUser()
+            user = loggedInUser
+            Result.Success(loggedInUser)
+        } catch (e: Exception) {
+            Result.Error(e)
+        }
     }
 
     fun logout() {
+        firebaseAuth.signOut()
         user = null
-        dataSource.logout()
     }
 
-    fun login(username: String, password: String): Result<LoggedInUser> {
-        // handle login
-        val result = dataSource.login(username, password)
-
-        if (result is Result.Success) {
-            setLoggedInUser(result.data)
-        }
-
-        return result
-    }
-
-    private fun setLoggedInUser(loggedInUser: LoggedInUser) {
-        this.user = loggedInUser
-        // If user credentials will be cached in local storage, it is recommended it be encrypted
-        // @see https://developer.android.com/training/articles/keystore
-    }
+    private fun com.google.firebase.auth.FirebaseUser.toLoggedInUser() =
+        LoggedInUser(
+            userId = uid,
+            displayName = displayName ?: email.orEmpty()
+        )
 }

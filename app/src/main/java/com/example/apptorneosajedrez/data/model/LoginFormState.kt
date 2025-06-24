@@ -1,4 +1,4 @@
-package com.example.apptorneosajedrez.ui.login
+package com.example.apptorneosajedrez.data.model
 
 /**
  * Data validation state of the login form.

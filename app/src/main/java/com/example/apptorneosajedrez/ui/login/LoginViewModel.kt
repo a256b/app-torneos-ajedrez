@@ -1,15 +1,18 @@
 package com.example.apptorneosajedrez.ui.login
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.*
 import android.util.Patterns
 import com.example.apptorneosajedrez.data.LoginRepository
 import com.example.apptorneosajedrez.data.Result
-
 import com.example.apptorneosajedrez.R
+import com.example.apptorneosajedrez.data.model.LoginFormState
+import com.example.apptorneosajedrez.data.model.LoginResult
+import kotlinx.coroutines.launch
+import java.io.IOException
 
-class LoginViewModel(private val loginRepository: LoginRepository) : ViewModel() {
+class LoginViewModel(
+    private val loginRepository: LoginRepository
+) : ViewModel() {
 
     private val _loginForm = MutableLiveData<LoginFormState>()
     val loginFormState: LiveData<LoginFormState> = _loginForm
@@ -17,15 +20,25 @@ class LoginViewModel(private val loginRepository: LoginRepository) : ViewModel()
     private val _loginResult = MutableLiveData<LoginResult>()
     val loginResult: LiveData<LoginResult> = _loginResult
 
-    fun login(username: String, password: String) {
-        // can be launched in a separate asynchronous job
-        val result = loginRepository.login(username, password)
+    fun login(email: String, password: String) {
+        // Opcional: podrías exponer un LiveData<Boolean> para mostrar un ProgressBar
+        viewModelScope.launch {
+            try {
+                when (val result = loginRepository.login(email, password)) {
+                    is Result.Success -> {
+                        val displayName = result.data.displayName
+                        _loginResult.value = LoginResult(
+                            success = LoggedInUserView(displayName = displayName)
+                        )
+                    }
 
-        if (result is Result.Success) {
-            _loginResult.value =
-                LoginResult(success = LoggedInUserView(displayName = result.data.displayName))
-        } else {
-            _loginResult.value = LoginResult(error = R.string.login_failed)
+                    is Result.Error -> {
+                        _loginResult.value = LoginResult(error = R.string.login_failed)
+                    }
+                }
+            } catch (e: IOException) {
+                _loginResult.value = LoginResult(error = R.string.login_failed)
+            }
         }
     }
 
@@ -39,7 +52,6 @@ class LoginViewModel(private val loginRepository: LoginRepository) : ViewModel()
         }
     }
 
-    // A placeholder username validation check
     private fun isUserNameValid(username: String): Boolean {
         return if (username.contains('@')) {
             Patterns.EMAIL_ADDRESS.matcher(username).matches()
@@ -48,7 +60,6 @@ class LoginViewModel(private val loginRepository: LoginRepository) : ViewModel()
         }
     }
 
-    // A placeholder password validation check
     private fun isPasswordValid(password: String): Boolean {
         return password.length > 5
     }

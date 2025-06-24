@@ -2,23 +2,19 @@ package com.example.apptorneosajedrez.ui.login
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.example.apptorneosajedrez.data.LoginDataSource
 import com.example.apptorneosajedrez.data.LoginRepository
 
 /**
- * ViewModel provider factory to instantiate LoginViewModel.
- * Required given LoginViewModel has a non-empty constructor
+ * ViewModelProvider.Factory para rhorinstanciar LoginViewModel
+ * usando el LoginRepository que se conecta a Firebase Auth.
  */
 class LoginViewModelFactory : ViewModelProvider.Factory {
 
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(LoginViewModel::class.java)) {
-            return LoginViewModel(
-                loginRepository = LoginRepository(
-                    dataSource = LoginDataSource()
-                )
-            ) as T
+            val repository = LoginRepository()
+            return LoginViewModel(loginRepository = repository) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }
