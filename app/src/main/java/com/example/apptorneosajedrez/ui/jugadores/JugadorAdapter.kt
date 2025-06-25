@@ -3,30 +3,81 @@ package com.example.apptorneosajedrez.ui.jugadores
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.apptorneosajedrez.R
+import com.example.apptorneosajedrez.model.Jugador
 
-class JugadorAdapter(private val jugadores: List<String>) :
-    RecyclerView.Adapter<JugadorAdapter.JugadorViewHolder>() {
+sealed class JugadorItem {
+    data class Header(val titulo: String) : JugadorItem()
+    data class JugadorData(val jugador: Jugador) : JugadorItem()
+}
 
-    class JugadorViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        private val nombreTextView: TextView = itemView.findViewById(R.id.textNombreJugador)
+class JugadorAdapter(
+    private val items: List<JugadorItem>,
+    private val onAceptarClick: (Jugador) -> Unit,
+    private val onRechazarClick: (Jugador) -> Unit
+) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-        fun bind(nombre: String) {
-            nombreTextView.text = nombre
+    companion object {
+        private const val TYPE_HEADER = 0
+        private const val TYPE_JUGADOR = 1
+    }
+
+    override fun getItemViewType(position: Int): Int {
+        return when (items[position]) {
+            is JugadorItem.Header -> TYPE_HEADER
+            is JugadorItem.JugadorData -> TYPE_JUGADOR
         }
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): JugadorViewHolder {
-        val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_jugador, parent, false)
-        return JugadorViewHolder(view)
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+        return if (viewType == TYPE_HEADER) {
+            val view = LayoutInflater.from(parent.context)
+                .inflate(R.layout.item_header, parent, false)
+            HeaderViewHolder(view)
+        } else {
+            val view = LayoutInflater.from(parent.context)
+                .inflate(R.layout.item_jugador, parent, false)
+            JugadorViewHolder(view)
+        }
     }
 
-    override fun onBindViewHolder(holder: JugadorViewHolder, position: Int) {
-        holder.bind(jugadores[position])
+    override fun getItemCount(): Int = items.size
+
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        when (val item = items[position]) {
+            is JugadorItem.Header -> (holder as HeaderViewHolder).bind(item.titulo)
+            is JugadorItem.JugadorData -> (holder as JugadorViewHolder).bind(item.jugador)
+        }
     }
 
-    override fun getItemCount(): Int = jugadores.size
+    inner class HeaderViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        private val txtHeader: TextView = view.findViewById(R.id.textHeader)
+        fun bind(titulo: String) {
+            txtHeader.text = titulo
+        }
+    }
+
+    inner class JugadorViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        private val nombreTextView: TextView = view.findViewById(R.id.textNombreJugador)
+        private val btnAceptar: Button = view.findViewById(R.id.btnAceptar)
+        private val btnRechazar: Button = view.findViewById(R.id.btnRechazar)
+
+        fun bind(jugador: Jugador) {
+            nombreTextView.text = jugador.nombre
+            btnAceptar.setOnClickListener { onAceptarClick(jugador) }
+            btnRechazar.setOnClickListener { onRechazarClick(jugador) }
+
+            // Ocultamos botón si ya está aceptado
+            if (jugador.estado == "aceptado") {
+                btnAceptar.visibility = View.GONE
+                btnRechazar.visibility = View.GONE
+            } else {
+                btnAceptar.visibility = View.VISIBLE
+                btnRechazar.visibility = View.VISIBLE
+            }
+        }
+    }
 }

@@ -9,16 +9,20 @@
         android:id="@+id/nav_home"
         android:name="com.example.apptorneosajedrez.ui.home.HomeFragment"
         android:label="@string/menu_inicio"
-        tools:layout="@layout/fragment_home" />
+        tools:layout="@layout/fragment_home">
+        <action
+            android:id="@+id/action_nav_home_to_detalleTorneoFragment"
+            app:destination="@id/detalleTorneoFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/nav_torneos"
         android:name="com.example.apptorneosajedrez.ui.torneos.TorneosFragment"
         android:label="@string/menu_torneos"
-        tools:layout="@layout/fragment_torneos" >
+        tools:layout="@layout/fragment_torneos">
         <action
-            android:id="@+id/action_nav_torneos_to_nuevoTorneoFragment2"
-            app:destination="@id/nuevoTorneoFragment" />
+            android:id="@+id/action_nav_torneos_to_nuevoTorneoFragment"
+            app:destination="@id/detalleTorneoFragment" />
     </fragment>
 
     <fragment
@@ -32,10 +36,23 @@
         android:name="com.example.apptorneosajedrez.ui.inscripciones.InscripcionesFragment"
         android:label="@string/menu_inscripciones"
         tools:layout="@layout/fragment_inscripciones" />
+
     <fragment
-        android:id="@+id/nuevoTorneoFragment"
+        android:id="@+id/nav_mapa"
+        android:name="com.example.apptorneosajedrez.ui.mapa.MapaFragment"
+        android:label="@string/menu_mapa"
+        tools:layout="@layout/fragment_mapa" />
+
+    <fragment
+        android:id="@+id/detalleTorneoFragment"
         android:name="com.example.apptorneosajedrez.ui.torneos.TorneoDetalleFragment"
         android:label="@string/detalle_torneo"
         tools:layout="@layout/fragment_torneo_detalle" />
+    <activity
+        android:id="@+id/loginActivity"
+        android:name="com.example.apptorneosajedrez.ui.login.LoginActivity"
+        android:label="activity_login"
+        tools:layout="@layout/activity_login" />
+
 
 </navigation>

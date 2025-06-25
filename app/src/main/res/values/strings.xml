@@ -10,9 +10,21 @@
     <string name="menu_torneos">Torneos</string>
     <string name="menu_jugadores">Jugadores</string>
     <string name="menu_inscripciones">Inscripciones</string>
+    <string name="menu_mapa">Mapa interactivo</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="inscribirse">Inscribirse</string>
     <string name="ver_partidas">Ver Partidas</string>
     <string name="detalle_torneo">Detalle Torneo</string>
     <string name="estrella">Estrella</string>
+    <string name="filtro">Filtro</string>
+    <string name="title_activity_login">Torneos de Ajedrez</string>
+    <string name="prompt_email">Correo electrónico</string>
+    <string name="prompt_password">Contraseña</string>
+    <string name="action_sign_in">Ingresar o registrarse</string>
+    <string name="action_sign_in_short">Ingresar</string>
+    <string name="welcome">"¡Bienvenido!"</string>
+    <string name="invalid_username">Usuario no válido</string>
+    <string name="invalid_password">Contraseña demasiado corta</string>
+    <string name="login_failed">"Inicio de sesión fallido"</string>
+    <string name="click_to_register">No tengo cuenta</string>
 </resources>

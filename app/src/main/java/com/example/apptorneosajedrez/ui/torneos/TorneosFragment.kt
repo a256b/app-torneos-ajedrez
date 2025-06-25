@@ -1,81 +1,139 @@
-package com.example.apptorneosajedrez.ui.torneos // Declaración del paquete donde se encuentra la clase
+package com.example.apptorneosajedrez.ui.torneos
 
-import androidx.fragment.app.viewModels // Importa la extensión para usar ViewModels en fragmentos
-import android.os.Bundle // Para manejar datos entre fragmentos y estados
-import androidx.fragment.app.Fragment // Clase base para fragmentos
-import android.view.LayoutInflater // Para inflar layouts
-import android.view.View // Para manejar vistas
-import android.view.ViewGroup // Contenedor de vistas
-import androidx.navigation.fragment.findNavController // Para obtener el controlador de navegación en fragmentos
-import com.example.apptorneosajedrez.R // Acceso a recursos
-import com.example.apptorneosajedrez.databinding.FragmentTorneosBinding // Binding para el fragmento de torneos
+import android.app.AlertDialog
+import android.app.DatePickerDialog
+import android.app.TimePickerDialog
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.ArrayAdapter
+import android.widget.EditText
+import android.widget.Spinner
+import android.widget.Toast
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
+import com.example.apptorneosajedrez.R
+import com.example.apptorneosajedrez.data.MarcadorRepository
+import com.example.apptorneosajedrez.data.TorneoRepository
+import com.example.apptorneosajedrez.databinding.FragmentTorneosBinding
+import com.example.apptorneosajedrez.model.Torneo
+import java.util.Calendar
 
-class TorneosFragment : Fragment() { // Definición del fragmento para la lista de torneos
+class TorneosFragment : Fragment() {
 
-    // Variable para manejar el binding (patrón View Binding)
-    private var _binding: FragmentTorneosBinding? = null // Inicialmente nulo, se inicializa en onCreateView y se limpia en onDestroyView
-    private val binding get() = _binding!! // Propiedad de acceso para evitar verificaciones de nulidad repetidas
+    private var _binding: FragmentTorneosBinding? = null
+    private val binding get() = _binding!!
 
-    // Lista de torneos para mostrar (datos de ejemplo)
-    private val torneos = listOf(
-        "Torneo Abierto de Ajedrez Ciudad de Buenos Aires",
-        "Memorial Miguel Najdorf",
-        "Campeonato Argentino de Ajedrez",
-        "Torneo Magistral de Mar del Plata",
-        "Copa Independencia de Ajedrez",
-        "Festival Internacional de Ajedrez de La Plata",
-        "Torneo Abierto de Ajedrez Córdoba Capital",
-        "Gran Prix de Ajedrez Patagonia",
-        "Torneo de Ajedrez Mendoza",
-        "Open de Ajedrez Rosario"
-    )
-
-    companion object { // Objeto compañero para métodos estáticos del fragmento
-        fun newInstance() = TorneosFragment() // Método de fábrica para crear instancias del fragmento
-    }
-
-    // Inicialización del ViewModel usando la extensión by viewModels()
-    private val viewModel: TorneosViewModel by viewModels()
-
-    override fun onCreate(savedInstanceState: Bundle?) { // Método llamado cuando se crea el fragmento
-        super.onCreate(savedInstanceState) // Llama al método onCreate de la clase padre
-    }
+    private val viewModel: TorneoViewModel by viewModels()
+    private var torneosList: List<String> = emptyList()
 
     override fun onCreateView(
-        inflater: LayoutInflater, // Inflador para crear vistas
-        container: ViewGroup?, // Contenedor padre donde se agregará el fragmento
-        savedInstanceState: Bundle? // Estado guardado del fragmento
-    ): View { // Devuelve la vista raíz del fragmento
-        _binding = FragmentTorneosBinding.inflate(
-            inflater,
-            container,
-            false
-        ) // Infla el layout usando view binding
-        val root = binding.root // Obtiene la vista raíz del binding
-
-        // Crea el adaptador con la lista de torneos y un lambda para manejar clicks
-        val adapter = TorneoAdapter(torneos, requireContext()) { nombreTorneo ->
-            navegarADetalleTorneo(nombreTorneo) // Cuando se hace click, navega al detalle
-        }
-        binding.recyclerViewTorneos.adapter = adapter // Asigna el adaptador al RecyclerView
-
-        return root // Devuelve la vista raíz
-
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
+    ): View {
+        _binding = FragmentTorneosBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
-    // Método para navegar al fragmento de detalle del torneo
-    private fun navegarADetalleTorneo(nombreTorneo: String) {
-        val bundle = Bundle().apply { // Crea un bundle para pasar datos
-            putString("nombreTorneo", nombreTorneo) // Agrega el nombre del torneo al bundle
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        observarTorneos()
+        binding.fabAgregarTorneo.setOnClickListener {
+            mostrarDialogoAgregarTorneo()
         }
-        findNavController().navigate( // Utiliza el controlador de navegación para navegar
-            R.id.action_nav_torneos_to_nuevoTorneoFragment2, // ID de la acción definida en el gráfico de navegación
-            bundle // Pasa el bundle con los datos
+    }
+
+    private fun observarTorneos() {
+        viewModel.torneos.observe(viewLifecycleOwner) { lista ->
+            actualizarListaTorneos(lista)
+            setupRecyclerView()
+        }
+    }
+
+    private fun actualizarListaTorneos(lista: List<Torneo>) {
+        torneosList = lista.map { it.nombre }
+    }
+
+    private fun setupRecyclerView() {
+        val adapter = TorneoAdapter(torneosList, requireContext()) { nombreTorneo ->
+            navegarADetalleTorneo(nombreTorneo)
+        }
+        binding.recyclerViewTorneos.adapter = adapter
+    }
+
+    private fun navegarADetalleTorneo(nombreTorneo: String) {
+        val args = Bundle().apply {
+            putString("nombreTorneo", nombreTorneo)
+        }
+        findNavController().navigate(
+            R.id.action_nav_torneos_to_nuevoTorneoFragment, args
         )
     }
 
-    override fun onDestroyView() { // Método llamado cuando se destruye la vista del fragmento
-        super.onDestroyView() // Llama al método onDestroyView de la clase padre
-        _binding = null // Limpia la referencia al binding para evitar fugas de memoria
+    private fun mostrarDialogoAgregarTorneo() {
+        val view = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_agregar_torneo, null)
+
+        val etNombre = view.findViewById<EditText>(R.id.etNombre)
+        val etDescripcion = view.findViewById<EditText>(R.id.etDescripcion)
+        val etFechaInicio = view.findViewById<EditText>(R.id.etFechaInicio)
+        val etFechaFin = view.findViewById<EditText>(R.id.etFechaFin)
+        val etHoraInicio = view.findViewById<EditText>(R.id.etHoraInicio)
+        val spinnerUbicacion = view.findViewById<Spinner>(R.id.spinnerUbicacion)
+
+        val calendario = Calendar.getInstance()
+
+        etFechaInicio.setOnClickListener {
+            DatePickerDialog(requireContext(), { _, y, m, d ->
+                etFechaInicio.setText("%04d-%02d-%02d".format(y, m + 1, d))
+            }, calendario[Calendar.YEAR], calendario[Calendar.MONTH], calendario[Calendar.DAY_OF_MONTH]).show()
+        }
+
+        etFechaFin.setOnClickListener {
+            DatePickerDialog(requireContext(), { _, y, m, d ->
+                etFechaFin.setText("%04d-%02d-%02d".format(y, m + 1, d))
+            }, calendario[Calendar.YEAR], calendario[Calendar.MONTH], calendario[Calendar.DAY_OF_MONTH]).show()
+        }
+
+        etHoraInicio.setOnClickListener {
+            TimePickerDialog(requireContext(), { _, h, m ->
+                etHoraInicio.setText("%02d:%02d".format(h, m))
+            }, calendario[Calendar.HOUR_OF_DAY], calendario[Calendar.MINUTE], true).show()
+        }
+
+        // Ubicaciones: cargar solo marcadores TORNEO
+        MarcadorRepository().escucharMarcadores { lista ->
+            val nombres = lista.filter { it.categoria.name == "TORNEO" }.map { it.nombre }
+            val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, nombres)
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            spinnerUbicacion.adapter = adapter
+        }
+
+        AlertDialog.Builder(requireContext())
+            .setTitle("Nuevo torneo")
+            .setView(view)
+            .setPositiveButton("Guardar") { _, _ ->
+                val torneo = Torneo(
+                    idTorneo = (0..99999).random(),
+                    nombre = etNombre.text.toString(),
+                    descripcion = etDescripcion.text.toString(),
+                    fechaInicio = etFechaInicio.text.toString(),
+                    fechaFin = etFechaFin.text.toString(),
+                    horaInicio = etHoraInicio.text.toString(),
+                    ubicacion = spinnerUbicacion.selectedItem?.toString() ?: ""
+                )
+                TorneoRepository().agregarTorneo(torneo) { exito ->
+                    Toast.makeText(requireContext(), if (exito) "Guardado" else "Error al guardar", Toast.LENGTH_SHORT).show()
+                }
+            }
+            .setNegativeButton("Cancelar", null)
+            .show()
     }
+
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
 }
