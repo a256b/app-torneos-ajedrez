@@ -27,7 +27,7 @@ class TorneosFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val viewModel: TorneoViewModel by viewModels()
-    private var torneosList: List<String> = emptyList()
+    private var torneosList: List<Torneo> = emptyList()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -46,29 +46,22 @@ class TorneosFragment : Fragment() {
 
     private fun observarTorneos() {
         viewModel.torneos.observe(viewLifecycleOwner) { lista ->
-            actualizarListaTorneos(lista)
+            torneosList = lista
             setupRecyclerView()
         }
     }
 
-    private fun actualizarListaTorneos(lista: List<Torneo>) {
-        torneosList = lista.map { it.nombre }
-    }
-
     private fun setupRecyclerView() {
-        val adapter = TorneoAdapter(torneosList, requireContext()) { nombreTorneo ->
-            navegarADetalleTorneo(nombreTorneo)
+        val adapter = TorneoAdapter(torneosList, requireContext()) { torneo ->
+            val bundle = Bundle().apply {
+                putSerializable("torneo", torneo)
+            }
+            findNavController().navigate(
+                R.id.action_nav_torneos_to_nuevoTorneoFragment,
+                bundle
+            )
         }
         binding.recyclerViewTorneos.adapter = adapter
-    }
-
-    private fun navegarADetalleTorneo(nombreTorneo: String) {
-        val args = Bundle().apply {
-            putString("nombreTorneo", nombreTorneo)
-        }
-        findNavController().navigate(
-            R.id.action_nav_torneos_to_nuevoTorneoFragment, args
-        )
     }
 
     private fun mostrarDialogoAgregarTorneo() {
@@ -101,7 +94,6 @@ class TorneosFragment : Fragment() {
             }, calendario[Calendar.HOUR_OF_DAY], calendario[Calendar.MINUTE], true).show()
         }
 
-        // Ubicaciones: cargar solo marcadores TORNEO
         MarcadorRepository().escucharMarcadores { lista ->
             val nombres = lista.filter { it.categoria.name == "TORNEO" }.map { it.nombre }
             val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, nombres)
@@ -130,10 +122,8 @@ class TorneosFragment : Fragment() {
             .show()
     }
 
-
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
-
 }
