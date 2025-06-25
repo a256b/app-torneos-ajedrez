@@ -6,8 +6,10 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
+import com.example.apptorneosajedrez.data.InscripcionRepository
 import com.example.apptorneosajedrez.databinding.FragmentTorneoDetalleBinding
+import com.example.apptorneosajedrez.model.Torneo
+import com.example.apptorneosajedrez.ui.movimientos.MovesActivity
 
 class TorneoDetalleFragment : Fragment() {
 
@@ -47,7 +49,6 @@ class TorneoDetalleFragment : Fragment() {
                 binding.tvCantidadInscriptos.text = "Inscriptos: $cantidad"
             }
         }
-    }
 
         binding.btnVerPartidas.setOnClickListener {
             val intent = Intent(requireContext(), MovesActivity::class.java)
