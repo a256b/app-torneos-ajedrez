@@ -2,6 +2,7 @@ package com.example.apptorneosajedrez.ui.movimientos
 
 import android.content.Intent
 import android.os.Bundle
+import android.text.InputFilter
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -23,34 +24,53 @@ class MovesActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         initializeViewBinding()
 
-        // 1) Asegúrate de que el usuario esté autenticado
         if (FirebaseAuth.getInstance().currentUser == null) {
             startActivity(Intent(this, LoginActivity::class.java))
             finish()
             return
         }
 
-        // 2) RecyclerView
         adapter = MovesAdapter(emptyList())
         binding.rvMoves.apply {
             layoutManager = LinearLayoutManager(this@MovesActivity)
             adapter = this@MovesActivity.adapter
         }
 
-        // 3) Observa cambios en Firestore
         vm.moves.observe(this) { list ->
             adapter.update(list)
             binding.rvMoves.scrollToPosition(list.size - 1)
         }
 
-        // 4) Envío de movimientos
+        val chessMoveRegex = Regex(
+            """^(?:(?:O-O(?:-O)?)|(?:[RDTAC]?[a-h]?[1-8]?x?[a-h][1-8](?:=[RDTAC])?))[+#]?(?:[!?]{1,2})?$"""
+        )
+
+
+        val chessCharFilter = InputFilter { source, _, _, _, _, _ ->
+            val allowed = "abcdefghABCDEFGH12345678xX=NBRQnbrq+#Oo-"
+            if (source.all { it in allowed }) source else ""
+        }
+        binding.etMoveInput.filters = arrayOf(chessCharFilter)
+
+        binding.btnSend.isEnabled = false
+
+        binding.etMoveInput.addTextChangedListener(object : android.text.TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                val input = s.toString().trim()
+                binding.btnSend.isEnabled = chessMoveRegex.matches(input)
+            }
+
+            override fun afterTextChanged(s: android.text.Editable?) {}
+        })
+
         binding.btnSend.setOnClickListener {
             val text = binding.etMoveInput.text.toString().trim()
             vm.sendMove(text)
             binding.etMoveInput.text?.clear()
         }
-
     }
+
 
     private fun initializeViewBinding() {
         enableEdgeToEdge()

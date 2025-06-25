@@ -65,11 +65,5 @@
             android:layout_gravity="center_horizontal"
             android:text="Ver partidas" />
 
-        <Button
-            android:id="@+id/btn_inscribirse"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:text="Inscribirse" />
     </LinearLayout>
 </ScrollView>
