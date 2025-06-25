@@ -10,17 +10,16 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.apptorneosajedrez.R
+import com.example.apptorneosajedrez.model.Torneo
 
 const val PREF_NAME = "torneos_prefs"
 const val KEY_TORNEO_DESTACADO = "torneos_destacados"
 
-
 class TorneoAdapter(
-    private val torneos: List<String>,
+    private val torneos: List<Torneo>,
     private val context: Context,
-    private val onTorneoClick: (String) -> Unit
+    private val onTorneoClick: (Torneo) -> Unit
 ) : RecyclerView.Adapter<TorneoAdapter.TorneoViewHolder>() {
-
 
     inner class TorneoViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val nombreTextView: TextView = itemView.findViewById(R.id.textNombreTorneo)
@@ -28,42 +27,36 @@ class TorneoAdapter(
         private val sharedPreferences: SharedPreferences =
             context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
 
-        fun bind(nombreTorneo: String) {
-            nombreTextView.text = nombreTorneo
+        fun bind(torneo: Torneo) {
+            nombreTextView.text = torneo.nombre
             itemView.setOnClickListener {
-                onTorneoClick(nombreTorneo)
+                onTorneoClick(torneo)
             }
 
-            val favoritos =
-                sharedPreferences.getStringSet(KEY_TORNEO_DESTACADO, setOf())?.toMutableSet()
-                    ?: mutableSetOf()
-            val esFavorito = favoritos.contains(nombreTorneo)
+            val favoritos = sharedPreferences.getStringSet(KEY_TORNEO_DESTACADO, setOf())?.toMutableSet()
+                ?: mutableSetOf()
+            val esFavorito = favoritos.contains(torneo.nombre)
 
             estrellaImageView.setImageResource(
                 if (esFavorito) R.drawable.ic_star2 else R.drawable.ic_star
             )
 
             estrellaImageView.setOnClickListener {
-                val nuevosFavoritos =
-                    sharedPreferences.getStringSet(KEY_TORNEO_DESTACADO, setOf())?.toMutableSet()
-                        ?: mutableSetOf()
+                val nuevosFavoritos = sharedPreferences.getStringSet(KEY_TORNEO_DESTACADO, setOf())?.toMutableSet()
+                    ?: mutableSetOf()
 
-                if (nuevosFavoritos.contains(nombreTorneo)) {
-                    nuevosFavoritos.remove(nombreTorneo)
+                if (nuevosFavoritos.contains(torneo.nombre)) {
+                    nuevosFavoritos.remove(torneo.nombre)
                     Toast.makeText(context, "Torneo desmarcado", Toast.LENGTH_SHORT).show()
                 } else {
-                    nuevosFavoritos.add(nombreTorneo)
+                    nuevosFavoritos.add(torneo.nombre)
                     Toast.makeText(context, "★ Torneo destacado", Toast.LENGTH_SHORT).show()
                 }
 
-                sharedPreferences.edit()
-                    .putStringSet(KEY_TORNEO_DESTACADO, nuevosFavoritos)
-                    .apply()
-
+                sharedPreferences.edit().putStringSet(KEY_TORNEO_DESTACADO, nuevosFavoritos).apply()
                 notifyItemChanged(adapterPosition)
             }
         }
-
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TorneoViewHolder {

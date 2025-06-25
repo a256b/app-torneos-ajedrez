@@ -7,23 +7,28 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.apptorneosajedrez.R
+import com.example.apptorneosajedrez.model.Torneo
 
 class DestacadosAdapter(
-    private val torneos: List<String>,
-    private val onEliminarFavorito: (String) -> Unit
+    private val torneos: List<Torneo>,
+    private val onEliminarFavorito: (Torneo) -> Unit,
+    private val onTorneoClick: (Torneo) -> Unit
 ) : RecyclerView.Adapter<DestacadosAdapter.DestacadoViewHolder>() {
 
     inner class DestacadoViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val nombreTextView: TextView = itemView.findViewById(R.id.textNombreTorneo)
         private val estrellaImageView: ImageView = itemView.findViewById(R.id.imgEstrella)
 
-        fun bind(nombreTorneo: String) {
-            nombreTextView.text = nombreTorneo
+        fun bind(torneo: Torneo) {
+            nombreTextView.text = torneo.nombre
             estrellaImageView.setImageResource(R.drawable.ic_star2)
 
-            // Para sacar de favoritos
             estrellaImageView.setOnClickListener {
-                onEliminarFavorito(nombreTorneo)
+                onEliminarFavorito(torneo)
+            }
+
+            itemView.setOnClickListener {
+                onTorneoClick(torneo)
             }
         }
     }
