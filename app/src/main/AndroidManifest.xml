@@ -18,6 +18,9 @@
         android:theme="@style/Theme.Material3.Light"
         tools:targetApi="31">
         <activity
+            android:name=".ui.movimientos.MovesActivity"
+            android:exported="true" />
+        <activity
             android:name=".ui.register.RegisterActivity"
             android:exported="false" />
         <activity
