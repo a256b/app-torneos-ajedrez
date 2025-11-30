@@ -49,7 +49,6 @@ class TorneoDetalleFragment : Fragment() {
                 binding.tvCantidadInscriptos.text = "Inscriptos: $cantidad"
             }
         }
-    }
 
         binding.btnVerPartidas.setOnClickListener {
             val intent = Intent(requireContext(), MovesActivity::class.java)
