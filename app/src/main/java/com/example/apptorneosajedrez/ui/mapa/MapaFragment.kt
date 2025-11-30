@@ -33,6 +33,11 @@ class MapaFragment : Fragment(), OnMapReadyCallback {
     private lateinit var googleMap: GoogleMap
     private val viewModel: MapaViewModel by viewModels()
 
+    private var filtroNombre: String = ""
+    private var filtroCategoria: String = "Seleccione categoría"
+    private var filtroDescripcion: String = ""
+    private var filtroDescuento: Int? = null
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
@@ -253,11 +258,10 @@ class MapaFragment : Fragment(), OnMapReadyCallback {
 
         val spinnerCategoria = dialogView.findViewById<Spinner>(R.id.spinnerCategoriaFiltro)
         val inputNombre = dialogView.findViewById<EditText>(R.id.editTextNombreFiltro)
-
         val inputDescripcion = dialogView.findViewById<EditText>(R.id.editTextDescripcionFiltro)
         val inputDescuento = dialogView.findViewById<EditText>(R.id.editTextDescuentoFiltro)
 
-        val categorias = listOf("Todas") + Categoria.values().map {
+        val categorias = listOf("Seleccione categoría") + Categoria.values().map {
             it.name.lowercase().replaceFirstChar(Char::titlecase)
         }
 
@@ -265,17 +269,23 @@ class MapaFragment : Fragment(), OnMapReadyCallback {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinnerCategoria.adapter = adapter
 
+        inputNombre.setText(filtroNombre)
+        inputDescripcion.setText(filtroDescripcion)
+        inputDescuento.setText(filtroDescuento?.toString() ?: "")
+
+        val indexCategoria = categorias.indexOf(filtroCategoria)
+        if (indexCategoria >= 0) spinnerCategoria.setSelection(indexCategoria)
+
         AlertDialog.Builder(requireContext())
             .setTitle("Filtrar marcadores")
             .setView(dialogView)
             .setPositiveButton("Filtrar") { _, _ ->
-                val nombreFiltro = inputNombre.text.toString().trim()
-                val categoriaSeleccionada = spinnerCategoria.selectedItem.toString()
+                filtroNombre = inputNombre.text.toString().trim()
+                filtroCategoria = spinnerCategoria.selectedItem.toString()
+                filtroDescripcion = inputDescripcion.text.toString().trim()
+                filtroDescuento = inputDescuento.text.toString().toIntOrNull()
 
-                val descFiltro = inputDescripcion.text.toString().trim()
-                val descuentoFiltro = inputDescuento.text.toString().toIntOrNull()
-
-                aplicarFiltro(nombreFiltro, categoriaSeleccionada, descFiltro, descuentoFiltro)
+                aplicarFiltro(filtroNombre, filtroCategoria, filtroDescripcion, filtroDescuento)
 
             }
             .setNegativeButton("Cancelar", null)
