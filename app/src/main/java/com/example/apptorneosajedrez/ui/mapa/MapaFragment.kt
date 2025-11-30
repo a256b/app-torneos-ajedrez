@@ -35,7 +35,7 @@ class MapaFragment : Fragment(), OnMapReadyCallback {
     private val viewModel: MapaViewModel by viewModels()
 
     private var filtroNombre: String = ""
-    private var filtroCategoria: String = "Seleccione categoría"
+    private var filtroCategoria: String = "Ambas categorías"
     private var filtroDescripcion: String = ""
     private var filtroDescuento: Int? = null
 
@@ -268,7 +268,7 @@ class MapaFragment : Fragment(), OnMapReadyCallback {
         val etDescripcion = dialogView.findViewById<EditText>(R.id.editTextDescripcionFiltro)
         val etDescuento = dialogView.findViewById<EditText>(R.id.editTextDescuentoFiltro)
 
-        val categorias = listOf("Seleccione categoría") + Categoria.values().map {
+        val categorias = listOf("Ambas categorías") + Categoria.values().map {
             it.name.lowercase().replaceFirstChar(Char::titlecase)
         }
 
@@ -311,7 +311,7 @@ class MapaFragment : Fragment(), OnMapReadyCallback {
 
         val filtrados = todos.filter { marcador ->
             val coincideNombre = nombre.isEmpty() || marcador.nombre.contains(nombre, ignoreCase = true)
-            val coincideCategoria = categoria == "Todas" || marcador.categoria.name.equals(categoria.uppercase(), ignoreCase = true)
+            val coincideCategoria = categoria == "Ambas categorías" || marcador.categoria.name.equals(categoria.uppercase(), ignoreCase = true)
             val coincideDescripcion =
                 descFiltro.isEmpty() ||
                         (marcador.descripcion?.contains(descFiltro, ignoreCase = true) == true)
