@@ -138,6 +138,20 @@ class MapaFragment : Fragment(), OnMapReadyCallback {
     private fun mostrarMarcadoresEnMapa(marcadores: List<Marcador>) {
         googleMap.clear()
 
+        Toast.makeText(
+            requireContext(),
+            if(marcadores.size==0){
+                "No existen lugares con esas características"
+            }else{
+                if(marcadores.size==1){
+                    "${marcadores.size} lugar encontrado"
+                }else{
+                    "${marcadores.size} lugares encontrados"
+                }
+            },
+            Toast.LENGTH_SHORT
+        ).show()
+
         for (marcador in marcadores) {
             val posicion = LatLng(marcador.latitud, marcador.longitud)
 
