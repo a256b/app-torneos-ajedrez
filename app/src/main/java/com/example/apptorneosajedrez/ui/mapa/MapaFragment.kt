@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.EditText
 import android.widget.Spinner
+import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -48,13 +49,60 @@ class MapaFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-
     override fun onMapReady(map: GoogleMap) {
         googleMap = map
+
+        googleMap.setInfoWindowAdapter(object : GoogleMap.InfoWindowAdapter {
+
+            override fun getInfoContents(marker: com.google.android.gms.maps.model.Marker): View? {
+                val marcador = viewModel.marcadores.value?.find {
+                    it.nombre == marker.title &&
+                            it.latitud == marker.position.latitude &&
+                            it.longitud == marker.position.longitude
+                }
+
+                return if (marcador?.categoria == Categoria.COMERCIO) {
+                    val inflater = LayoutInflater.from(requireContext())
+                    val view = inflater.inflate(R.layout.info_comercio, null)
+
+                    val tvTitulo = view.findViewById<TextView>(R.id.tvTitulo)
+                    val tvDescuento = view.findViewById<TextView>(R.id.tvDescuento)
+                    val tvDescripcion = view.findViewById<TextView>(R.id.tvDescripcion)
+
+                    tvTitulo.text = marker.title
+
+                    val snippet = marker.snippet ?: ""
+                    val partes = snippet.split("\n")
+
+                    val desc = partes.getOrNull(0) ?: ""
+                    val descripcion = partes.getOrNull(1) ?: ""
+
+                    tvDescuento.text = desc
+                    tvDescripcion.text = descripcion
+
+                    view
+                } else {
+                    // TODO: por si se muestra otra cosa en los otros markers
+                    null
+                }
+            }
+
+            override fun getInfoWindow(marker: com.google.android.gms.maps.model.Marker): View? {
+                return null
+            }
+        })
+
         googleMap.setOnMapLongClickListener { latLng ->
             mostrarDialogoAgregarMarcador(latLng)
         }
+
+        googleMap.setOnMarkerClickListener { marker ->
+            marker.showInfoWindow()
+            true
+        }
     }
+
+
 
     override fun onResume() {
         super.onResume()
@@ -81,8 +129,6 @@ class MapaFragment : Fragment(), OnMapReadyCallback {
         }
     }
 
-
-
     private fun mostrarMarcadoresEnMapa(marcadores: List<Marcador>) {
         googleMap.clear()
 
@@ -99,6 +145,24 @@ class MapaFragment : Fragment(), OnMapReadyCallback {
                 .title(marcador.nombre)
                 .icon(BitmapDescriptorFactory.defaultMarker(color))
 
+            if (marcador.categoria == Categoria.COMERCIO) {
+
+                val partes = mutableListOf<String>()
+
+                marcador.descuento?.let {
+                    partes.add("Descuento: $it%")
+                }
+
+                marcador.descripcion?.let {
+                    if (it.isNotBlank()) partes.add("Descripción: $it")
+                }
+
+                options.snippet(
+                    partes.joinToString("\n")
+                )
+            }
+
+
             googleMap.addMarker(options)
         }
 
@@ -110,7 +174,6 @@ class MapaFragment : Fragment(), OnMapReadyCallback {
         val primerMarcador = LatLng(marcadores[0].latitud, marcadores[0].longitud)
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(primerMarcador, 12f))
     }
-
 
     private fun mostrarDialogoAgregarMarcador(latLng: LatLng) {
         val dialogView =
@@ -153,7 +216,6 @@ class MapaFragment : Fragment(), OnMapReadyCallback {
             .setNegativeButton("Cancelar", null)
             .show()
     }
-
 
     private fun guardarMarcador(nombre: String, descripcion: String, descuento: Int, latLng: LatLng, categoriaSeleccionada: Categoria) {
         val marcador = Marcador(
@@ -204,6 +266,8 @@ class MapaFragment : Fragment(), OnMapReadyCallback {
 
         mostrarMarcadoresEnMapa(filtrados)
     }
+
+
 
     override fun onDestroyView() {
         super.onDestroyView()
