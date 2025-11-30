@@ -21,4 +21,24 @@
         android:layout_height="wrap_content"
         android:spinnerMode="dropdown" />
 
+    <EditText
+        android:id="@+id/editTextDescripcion"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Descripción"
+        android:inputType="textMultiLine"
+        android:minLines="3"
+        android:gravity="top"
+        android:paddingTop="12dp" />
+
+    <EditText
+        android:id="@+id/editTextDescuento"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Descuento (%)"
+        android:inputType="number"
+        android:maxLength="3"
+        android:importantForAutofill="no"
+        android:autofillHints="" />
+
 </LinearLayout>

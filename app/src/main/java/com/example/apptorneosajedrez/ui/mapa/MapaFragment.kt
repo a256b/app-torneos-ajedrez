@@ -119,6 +119,9 @@ class MapaFragment : Fragment(), OnMapReadyCallback {
         val inputNombre = dialogView.findViewById<EditText>(R.id.editTextNombre)
         val spinnerCategoria = dialogView.findViewById<Spinner>(R.id.spinnerCategoria)
 
+        val inputDescripcion = dialogView.findViewById<EditText>(R.id.editTextDescripcion)
+        val inputDescuento = dialogView.findViewById<EditText>(R.id.editTextDescuento)
+
         val categorias = Categoria.values()
         val adapter = ArrayAdapter(
             requireContext(),
@@ -133,10 +136,12 @@ class MapaFragment : Fragment(), OnMapReadyCallback {
             .setView(dialogView)
             .setPositiveButton("Guardar") { _, _ ->
                 val nombre = inputNombre.text.toString().trim()
+                val descripcion = inputDescripcion.text.toString().trim()
+                val descuento = inputDescuento.text.toString().toIntOrNull() ?: 0
                 val categoriaSeleccionada = categorias[spinnerCategoria.selectedItemPosition]
 
                 if (nombre.isNotEmpty()) {
-                    guardarMarcador(nombre, latLng, categoriaSeleccionada)
+                    guardarMarcador(nombre, descripcion, descuento, latLng, categoriaSeleccionada)
                 } else {
                     Toast.makeText(
                         requireContext(),
@@ -150,9 +155,9 @@ class MapaFragment : Fragment(), OnMapReadyCallback {
     }
 
 
-    private fun guardarMarcador(nombre: String, latLng: LatLng, categoriaSeleccionada: Categoria) {
+    private fun guardarMarcador(nombre: String, descripcion: String, descuento: Int, latLng: LatLng, categoriaSeleccionada: Categoria) {
         val marcador = Marcador(
-            nombre = nombre, latitud = latLng.latitude, longitud = latLng.longitude, categoria = categoriaSeleccionada
+            nombre = nombre, descripcion = descripcion, descuento = descuento ,latitud = latLng.latitude, longitud = latLng.longitude, categoria = categoriaSeleccionada
         )
 
         viewModel.agregarMarcador(marcador) { exito ->
