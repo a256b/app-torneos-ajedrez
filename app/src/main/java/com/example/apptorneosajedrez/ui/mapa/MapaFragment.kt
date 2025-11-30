@@ -254,6 +254,9 @@ class MapaFragment : Fragment(), OnMapReadyCallback {
         val spinnerCategoria = dialogView.findViewById<Spinner>(R.id.spinnerCategoriaFiltro)
         val inputNombre = dialogView.findViewById<EditText>(R.id.editTextNombreFiltro)
 
+        val inputDescripcion = dialogView.findViewById<EditText>(R.id.editTextDescripcionFiltro)
+        val inputDescuento = dialogView.findViewById<EditText>(R.id.editTextDescuentoFiltro)
+
         val categorias = listOf("Todas") + Categoria.values().map {
             it.name.lowercase().replaceFirstChar(Char::titlecase)
         }
@@ -269,19 +272,34 @@ class MapaFragment : Fragment(), OnMapReadyCallback {
                 val nombreFiltro = inputNombre.text.toString().trim()
                 val categoriaSeleccionada = spinnerCategoria.selectedItem.toString()
 
-                aplicarFiltro(nombreFiltro, categoriaSeleccionada)
+                val descFiltro = inputDescripcion.text.toString().trim()
+                val descuentoFiltro = inputDescuento.text.toString().toIntOrNull()
+
+                aplicarFiltro(nombreFiltro, categoriaSeleccionada, descFiltro, descuentoFiltro)
+
             }
             .setNegativeButton("Cancelar", null)
             .show()
     }
 
-    private fun aplicarFiltro(nombre: String, categoria: String) {
+    private fun aplicarFiltro(nombre: String, categoria: String, descFiltro: String, descuentoFiltro: Int?) {
         val todos = viewModel.marcadores.value ?: return
 
         val filtrados = todos.filter { marcador ->
             val coincideNombre = nombre.isEmpty() || marcador.nombre.contains(nombre, ignoreCase = true)
             val coincideCategoria = categoria == "Todas" || marcador.categoria.name.equals(categoria.uppercase(), ignoreCase = true)
-            coincideNombre && coincideCategoria
+            val coincideDescripcion =
+                descFiltro.isEmpty() ||
+                        (marcador.descripcion?.contains(descFiltro, ignoreCase = true) == true)
+
+            val coincideDescuento =
+                descuentoFiltro == null ||
+                        marcador.descuento == descuentoFiltro
+
+            coincideNombre &&
+                    coincideCategoria &&
+                    coincideDescripcion &&
+                    coincideDescuento
         }
 
         mostrarMarcadoresEnMapa(filtrados)

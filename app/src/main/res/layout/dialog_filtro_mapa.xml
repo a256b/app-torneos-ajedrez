@@ -16,4 +16,17 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Nombre..." />
+
+    <EditText
+        android:id="@+id/editTextDescripcionFiltro"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Descripción" />
+
+    <EditText
+        android:id="@+id/editTextDescuentoFiltro"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="number"
+        android:hint="Descuento" />
 </LinearLayout>
