@@ -50,6 +50,7 @@ class TorneoDetalleFragment : Fragment() {
             }
         }
 
+
         binding.btnVerPartidas.setOnClickListener {
             val intent = Intent(requireContext(), MovesActivity::class.java)
             startActivity(intent)
