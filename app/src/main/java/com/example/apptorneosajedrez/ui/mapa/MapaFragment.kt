@@ -217,11 +217,13 @@ class MapaFragment : Fragment(), OnMapReadyCallback {
             .setView(dialogView)
             .setPositiveButton("Guardar") { _, _ ->
                 val nombre = inputNombre.text.toString().trim()
-                val descripcion = inputDescripcion.text.toString().trim()
-                val descuento = inputDescuento.text.toString().toIntOrNull() ?: 0
                 val categoriaSeleccionada = categorias[spinnerCategoria.selectedItemPosition]
+                val descripcion = if (categoriaSeleccionada == Categoria.COMERCIO) inputDescripcion.text.toString().trim() else null
+                val descuento = if (categoriaSeleccionada == Categoria.COMERCIO) inputDescuento.text.toString().toIntOrNull() else null
+
 
                 if (nombre.isNotEmpty()) {
+
                     guardarMarcador(nombre, descripcion, descuento, latLng, categoriaSeleccionada)
                 } else {
                     Toast.makeText(
@@ -235,7 +237,7 @@ class MapaFragment : Fragment(), OnMapReadyCallback {
             .show()
     }
 
-    private fun guardarMarcador(nombre: String, descripcion: String, descuento: Int, latLng: LatLng, categoriaSeleccionada: Categoria) {
+    private fun guardarMarcador(nombre: String, descripcion: String?, descuento: Int?, latLng: LatLng, categoriaSeleccionada: Categoria) {
         val marcador = Marcador(
             nombre = nombre, descripcion = descripcion, descuento = descuento ,latitud = latLng.latitude, longitud = latLng.longitude, categoria = categoriaSeleccionada
         )
