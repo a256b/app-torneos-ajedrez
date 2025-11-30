@@ -189,10 +189,28 @@ class MapaFragment : Fragment(), OnMapReadyCallback {
         val adapter = ArrayAdapter(
             requireContext(),
             android.R.layout.simple_spinner_item,
-            categorias.map { it.name.lowercase().replaceFirstChar(Char::titlecase) } // "Torneo", "Comercio"
+            categorias.map { it.name.lowercase().replaceFirstChar(Char::titlecase) }
         )
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinnerCategoria.adapter = adapter
+
+        inputDescripcion.isEnabled = false
+        inputDescuento.isEnabled = false
+        spinnerCategoria.setOnItemSelectedListener(object : android.widget.AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(
+                parent: android.widget.AdapterView<*>?,
+                view: View?,
+                position: Int,
+                id: Long
+            ) {
+                val seleccionado = categorias[position]
+                val esComercio = seleccionado == Categoria.COMERCIO
+                inputDescripcion.isEnabled = esComercio
+                inputDescuento.isEnabled = esComercio
+            }
+
+            override fun onNothingSelected(parent: android.widget.AdapterView<*>?) {}
+        })
 
         AlertDialog.Builder(requireContext())
             .setTitle("Nuevo marcador")
