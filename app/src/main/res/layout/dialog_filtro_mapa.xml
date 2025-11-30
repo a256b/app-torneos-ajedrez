@@ -6,27 +6,44 @@
     android:orientation="vertical"
     android:padding="16dp">
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="start">
+
+        <Button
+            android:id="@+id/btnLimpiarFiltros"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Limpiar filtros" />
+    </LinearLayout>
+
     <Spinner
         android:id="@+id/spinnerCategoriaFiltro"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"/>
 
     <EditText
         android:id="@+id/editTextNombreFiltro"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Nombre..." />
+        android:hint="Nombre..."
+        android:layout_marginTop="8dp"/>
 
     <EditText
         android:id="@+id/editTextDescripcionFiltro"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Descripción" />
+        android:hint="Descripción..."
+        android:layout_marginTop="8dp"/>
 
     <EditText
         android:id="@+id/editTextDescuentoFiltro"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:hint="Descuento (%)..."
         android:inputType="number"
-        android:hint="Descuento" />
+        android:layout_marginTop="8dp"/>
 </LinearLayout>

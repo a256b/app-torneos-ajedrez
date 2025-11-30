@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
+import android.widget.Button
 import android.widget.EditText
 import android.widget.Spinner
 import android.widget.TextView
@@ -261,6 +262,12 @@ class MapaFragment : Fragment(), OnMapReadyCallback {
         val inputDescripcion = dialogView.findViewById<EditText>(R.id.editTextDescripcionFiltro)
         val inputDescuento = dialogView.findViewById<EditText>(R.id.editTextDescuentoFiltro)
 
+        val btnLimpiar = dialogView.findViewById<Button>(R.id.btnLimpiarFiltros)
+        val spnCat = dialogView.findViewById<Spinner>(R.id.spinnerCategoriaFiltro)
+        val etNombre = dialogView.findViewById<EditText>(R.id.editTextNombreFiltro)
+        val etDescripcion = dialogView.findViewById<EditText>(R.id.editTextDescripcionFiltro)
+        val etDescuento = dialogView.findViewById<EditText>(R.id.editTextDescuentoFiltro)
+
         val categorias = listOf("Seleccione categoría") + Categoria.values().map {
             it.name.lowercase().replaceFirstChar(Char::titlecase)
         }
@@ -290,6 +297,13 @@ class MapaFragment : Fragment(), OnMapReadyCallback {
             }
             .setNegativeButton("Cancelar", null)
             .show()
+
+        btnLimpiar.setOnClickListener {
+            spnCat.setSelection(0)
+            etNombre.setText("")
+            etDescripcion.setText("")
+            etDescuento.setText("")
+        }
     }
 
     private fun aplicarFiltro(nombre: String, categoria: String, descFiltro: String, descuentoFiltro: Int?) {
