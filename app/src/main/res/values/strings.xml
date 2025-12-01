@@ -1,8 +1,8 @@
 <resources>
-    <string name="app_name">AppTorneosAjedrez</string>
+    <string name="app_name">Torneos de Ajedrez</string>
     <string name="navigation_drawer_open">Abrir navigation drawer</string>
     <string name="navigation_drawer_close">Cerrar navigation drawer</string>
-    <string name="nav_header_title">Ajedrez - TNT</string>
+    <string name="nav_header_title">Torneos de Ajedrez</string>
     <string name="nav_header_desc">Navigation header</string>
     <string name="action_settings">Configuración</string>
 
