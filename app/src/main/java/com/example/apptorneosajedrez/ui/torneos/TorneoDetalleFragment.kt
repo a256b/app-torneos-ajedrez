@@ -2,12 +2,14 @@ package com.example.apptorneosajedrez.ui.torneos
 
 import android.content.Intent
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.example.apptorneosajedrez.databinding.FragmentTorneoDetalleBinding
+import com.example.apptorneosajedrez.ui.movimientos.MovesActivity
+import com.example.apptorneosajedrez.data.InscripcionRepository
+import com.example.apptorneosajedrez.model.Torneo
 
 class TorneoDetalleFragment : Fragment() {
 
@@ -26,7 +28,7 @@ class TorneoDetalleFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentTorneoDetalleBinding.inflate(inflater, container, false)
+        _binding = FragmentTorneoDetalleBinding.inflate(layoutInflater, container, false)
         return binding.root
     }
 
@@ -59,5 +61,4 @@ class TorneoDetalleFragment : Fragment() {
         super.onDestroyView()
         _binding = null
     }
-
 }
