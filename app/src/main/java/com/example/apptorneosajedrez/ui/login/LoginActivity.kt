@@ -3,13 +3,11 @@ package com.example.apptorneosajedrez.ui.login
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import android.view.inputmethod.EditorInfo
-import android.widget.EditText
 import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.example.apptorneosajedrez.MainActivity
@@ -30,22 +28,18 @@ class LoginActivity : AppCompatActivity() {
         binding = ActivityLoginBinding.inflate(layoutInflater).also {
             setContentView(it.root)
         }
-
         setupListeners()
         setupObservers()
     }
 
     private fun setupListeners() {
-        binding.registerNow.setOnClickListener {
-            startActivity(Intent(this, RegisterActivity::class.java))
-        }
 
-        binding.username.afterTextChanged { text ->
+        binding.username.addTextChangedListener {
             onCredentialsChanged()
         }
 
         binding.password.apply {
-            afterTextChanged { text ->
+            addTextChangedListener {
                 onCredentialsChanged()
             }
 
@@ -61,19 +55,24 @@ class LoginActivity : AppCompatActivity() {
             binding.loading.visibility = android.view.View.VISIBLE
             performLogin()
         }
+
+        binding.registerNow.setOnClickListener {
+            startActivity(Intent(this@LoginActivity, RegisterActivity::class.java))
+        }
     }
 
     private fun setupObservers() {
         loginViewModel.loginFormState.observe(this, Observer { state ->
             state ?: return@Observer
-            binding.btnLogin.isEnabled = state.isDataValid
 
+            binding.btnLogin.isEnabled = state.isDataValid
             binding.username.error = state.usernameError?.let { getString(it) }
             binding.password.error = state.passwordError?.let { getString(it) }
         })
 
         loginViewModel.loginResult.observe(this, Observer { result ->
             result ?: return@Observer
+
             binding.loading.visibility = android.view.View.GONE
 
             result.error?.let { showLoginFailed(it) }
@@ -99,7 +98,9 @@ class LoginActivity : AppCompatActivity() {
     private fun updateUiWithUser(model: LoggedInUserView) {
         val welcome = getString(R.string.welcome)
         Toast.makeText(
-            applicationContext, "$welcome ${model.displayName}", Toast.LENGTH_LONG
+            applicationContext,
+            "$welcome ${model.displayName}",
+            Toast.LENGTH_LONG
         ).show()
         startActivity(Intent(this, MainActivity::class.java))
     }
@@ -108,19 +109,4 @@ class LoginActivity : AppCompatActivity() {
         Toast.makeText(applicationContext, errorRes, Toast.LENGTH_SHORT).show()
         startActivity(Intent(this, LoginActivity::class.java))
     }
-}
-
-/**
- * Extension function to simplify setting an afterTextChanged action to EditText components.
- */
-fun EditText.afterTextChanged(afterTextChanged: (String) -> Unit) {
-    this.addTextChangedListener(object : TextWatcher {
-        override fun afterTextChanged(editable: Editable?) {
-            afterTextChanged.invoke(editable.toString())
-        }
-
-        override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
-
-        override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
-    })
 }

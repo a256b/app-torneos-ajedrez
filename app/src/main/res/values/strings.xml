@@ -27,4 +27,8 @@
     <string name="invalid_password">Contraseña demasiado corta</string>
     <string name="login_failed">"Inicio de sesión fallido"</string>
     <string name="click_to_register">No tengo cuenta</string>
+    <string name="full_name">Nombre completo</string>
+    <string name="password_confirm">Confirmar contraseña</string>
+    <string name="already_have_account">Ya tengo cuenta</string>
+    <string name="action_register">Registrar</string>
 </resources>
