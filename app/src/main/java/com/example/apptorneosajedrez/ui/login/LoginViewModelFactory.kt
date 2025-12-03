@@ -4,10 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.apptorneosajedrez.data.LoginRepository
 
-/**
- * ViewModelProvider.Factory para rhorinstanciar LoginViewModel
- * usando el LoginRepository que se conecta a Firebase Auth.
- */
 class LoginViewModelFactory : ViewModelProvider.Factory {
 
     @Suppress("UNCHECKED_CAST")

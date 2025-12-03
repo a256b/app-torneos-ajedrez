@@ -34,14 +34,9 @@ class LoginActivity : AppCompatActivity() {
 
     private fun setupListeners() {
 
-        binding.username.addTextChangedListener {
-            onCredentialsChanged()
-        }
-
+        binding.username.addTextChangedListener { onCredentialsChanged() }
         binding.password.apply {
-            addTextChangedListener {
-                onCredentialsChanged()
-            }
+            addTextChangedListener { onCredentialsChanged() }
 
             setOnEditorActionListener { _, actionId, _ ->
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
@@ -50,12 +45,10 @@ class LoginActivity : AppCompatActivity() {
                 false
             }
         }
-
         binding.btnLogin.setOnClickListener {
             binding.loading.visibility = android.view.View.VISIBLE
             performLogin()
         }
-
         binding.registerNow.setOnClickListener {
             startActivity(Intent(this@LoginActivity, RegisterActivity::class.java))
         }

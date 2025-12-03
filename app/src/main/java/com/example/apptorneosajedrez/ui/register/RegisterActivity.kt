@@ -1,123 +1,97 @@
+// RegisterActivity.kt
 package com.example.apptorneosajedrez.ui.register
 
+import android.content.Intent
 import android.os.Bundle
-import android.util.Log
+import android.view.View
 import android.widget.Toast
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
+import androidx.core.widget.addTextChangedListener
+import androidx.lifecycle.ViewModelProvider
 import com.example.apptorneosajedrez.databinding.ActivityRegisterBinding
-import com.google.firebase.Firebase
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.auth.auth
+import com.example.apptorneosajedrez.ui.login.LoginActivity
 
 class RegisterActivity : AppCompatActivity() {
+
     private lateinit var binding: ActivityRegisterBinding
-    private lateinit var auth: FirebaseAuth
+
+    private val registerViewModel: RegisterViewModel by lazy {
+        ViewModelProvider(this, RegisterViewModelFactory())
+            .get(RegisterViewModel::class.java)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        enableEdgeToEdge()
         binding = ActivityRegisterBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        applySystemWindowInsets()
-
-        auth = Firebase.auth
+        setupObservers()
+        setupListeners()
     }
 
-    private fun applySystemWindowInsets() {
-        ViewCompat.setOnApplyWindowInsetsListener(binding.main) { view, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            view.setPadding(
-                systemBars.left,
-                systemBars.top,
-                systemBars.right,
-                systemBars.bottom
+
+    private fun setupObservers() {
+        registerViewModel.registerFormState.observe(this) { state ->
+            state ?: return@observe
+
+            binding.btnRegister.isEnabled = state.isDataValid
+
+            state.fullNameError?.let { binding.fullName.error = getString(it) }
+            state.emailError?.let { binding.username.error = getString(it) }
+            state.passwordError?.let { binding.password.error = getString(it) }
+            state.confirmPasswordError?.let { binding.confirmPassword.error = getString(it) }
+        }
+
+        registerViewModel.registerResult.observe(this) { result ->
+            result ?: return@observe
+
+            binding.loading.visibility = if (result.loading) View.VISIBLE else View.GONE
+
+            result.error?.let {
+                Toast.makeText(this, it, Toast.LENGTH_LONG).show()
+            }
+
+            result.success?.let { user ->
+                Toast.makeText(this, "Usuario creado: ${user.fullName}", Toast.LENGTH_LONG).show()
+                // aquí podrías ir a MainActivity, cerrar esta Activity, etc.
+                // startActivity(Intent(this, MainActivity::class.java))
+                // finish()
+            }
+        }
+    }
+
+    private fun setupListeners() {
+        // Cada vez que cambia un campo, se valida el formulario
+        val watcher: (String) -> Unit = {
+            registerViewModel.registerDataChanged(
+                fullName = binding.fullName.text.toString(),
+                email = binding.username.text.toString(),
+                password = binding.password.text.toString(),
+                confirmPassword = binding.confirmPassword.text.toString()
             )
-            insets
+        }
+
+        binding.fullName.addTextChangedListener { watcher(it.toString()) }
+        binding.username.addTextChangedListener { watcher(it.toString()) }
+        binding.password.addTextChangedListener { watcher(it.toString()) }
+        binding.confirmPassword.addTextChangedListener { watcher(it.toString()) }
+
+        binding.btnRegister.setOnClickListener {
+            val fullName = binding.fullName.text.toString().trim()
+            val email = binding.username.text.toString().trim()
+            val password = binding.password.text.toString()
+            val confirmPassword = binding.confirmPassword.text.toString()
+
+            registerViewModel.register(
+                fullName = fullName,
+                email = email,
+                password = password,
+                confirmPassword = confirmPassword
+            )
+        }
+
+        binding.loginNow.setOnClickListener {
+            startActivity(Intent(this@RegisterActivity, LoginActivity::class.java))
         }
     }
-
-    // [START on_start_check_user]
-    public override fun onStart() {
-        super.onStart()
-        // Check if user is signed in (non-null) and update UI accordingly.
-        val currentUser = auth.currentUser
-        if (currentUser != null) {
-            reload()
-        }
-    }
-    // [END on_start_check_user]
-
-    private fun createAccount(email: String, password: String) {
-        // [START create_user_with_email]
-        auth.createUserWithEmailAndPassword(email, password)
-            .addOnCompleteListener(this) { task ->
-                if (task.isSuccessful) {
-                    // Sign in success, update UI with the signed-in user's information
-                    Log.d(TAG, "createUserWithEmail:success")
-                    val user = auth.currentUser
-                    updateUI(user)
-                } else {
-                    // If sign in fails, display a message to the user.
-                    Log.w(TAG, "createUserWithEmail:failure", task.exception)
-                    Toast.makeText(
-                        baseContext,
-                        "Authentication failed.",
-                        Toast.LENGTH_SHORT,
-                    ).show()
-                    updateUI(null)
-                }
-            }
-        // [END create_user_with_email]
-    }
-
-    private fun signIn(email: String, password: String) {
-        // [START sign_in_with_email]
-        auth.signInWithEmailAndPassword(email, password)
-            .addOnCompleteListener(this) { task ->
-                if (task.isSuccessful) {
-                    // Sign in success, update UI with the signed-in user's information
-                    Log.d(TAG, "signInWithEmail:success")
-                    val user = auth.currentUser
-                    updateUI(user)
-                } else {
-                    // If sign in fails, display a message to the user.
-                    Log.w(TAG, "signInWithEmail:failure", task.exception)
-                    Toast.makeText(
-                        baseContext,
-                        "Authentication failed.",
-                        Toast.LENGTH_SHORT,
-                    ).show()
-                    updateUI(null)
-                }
-            }
-        // [END sign_in_with_email]
-    }
-
-    private fun sendEmailVerification() {
-        // [START send_email_verification]
-        val user = auth.currentUser!!
-        user.sendEmailVerification()
-            .addOnCompleteListener(this) { task ->
-                // Email Verification sent
-            }
-        // [END send_email_verification]
-    }
-
-    private fun updateUI(user: FirebaseUser?) {
-    }
-
-    private fun reload() {
-    }
-
-    companion object {
-        private const val TAG = "EmailPassword"
-    }
-
-
 }
