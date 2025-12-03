@@ -1,6 +1,5 @@
 package com.example.apptorneosajedrez.ui.login
 
-import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.view.inputmethod.EditorInfo
@@ -19,8 +18,7 @@ class LoginActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityLoginBinding
     private val loginViewModel: LoginViewModel by lazy {
-        ViewModelProvider(this, LoginViewModelFactory())
-            .get(LoginViewModel::class.java)
+        ViewModelProvider(this, LoginViewModelFactory())[LoginViewModel::class.java]
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -71,7 +69,7 @@ class LoginActivity : AppCompatActivity() {
             result.error?.let { showLoginFailed(it) }
             result.success?.let { updateUiWithUser(it) }
 
-            setResult(Activity.RESULT_OK)
+            setResult(RESULT_OK)
             finish()
         })
     }
