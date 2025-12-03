@@ -1,7 +1,6 @@
 package com.example.apptorneosajedrez.data
 
 import com.example.apptorneosajedrez.model.AppUser
-import com.example.apptorneosajedrez.data.Result
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 

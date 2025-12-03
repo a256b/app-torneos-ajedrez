@@ -53,9 +53,8 @@ class RegisterActivity : AppCompatActivity() {
 
             result.success?.let { user ->
                 Toast.makeText(this, "Usuario creado: ${user.fullName}", Toast.LENGTH_LONG).show()
-                // aquí podrías ir a MainActivity, cerrar esta Activity, etc.
-                // startActivity(Intent(this, MainActivity::class.java))
-                // finish()
+                startActivity(Intent(this, LoginActivity::class.java))
+                finish()
             }
         }
     }
