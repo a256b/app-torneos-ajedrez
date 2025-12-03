@@ -36,7 +36,7 @@ class LoginViewModel(
                         _loginResult.value = LoginResult(error = R.string.login_failed)
                     }
                 }
-            } catch (e: IOException) {
+            } catch (_: IOException) {
                 _loginResult.value = LoginResult(error = R.string.login_failed)
             }
         }
