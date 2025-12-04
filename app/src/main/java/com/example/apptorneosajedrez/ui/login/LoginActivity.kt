@@ -14,90 +14,137 @@ import com.example.apptorneosajedrez.R
 import com.example.apptorneosajedrez.databinding.ActivityLoginBinding
 import com.example.apptorneosajedrez.ui.register.RegisterActivity
 
+
+
+import androidx.activity.viewModels
+import androidx.lifecycle.lifecycleScope
+
+import androidx.credentials.CredentialManager
+import androidx.credentials.GetCredentialRequest
+import androidx.credentials.exceptions.GetCredentialException
+import androidx.credentials.CustomCredential
+
+import com.google.android.libraries.identity.googleid.GetGoogleIdOption
+import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
+import com.google.android.libraries.identity.googleid.GoogleIdTokenParsingException
+
+import kotlinx.coroutines.launch
 class LoginActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityLoginBinding
-    private val loginViewModel: LoginViewModel by lazy {
-        ViewModelProvider(this, LoginViewModelFactory())[LoginViewModel::class.java]
+
+    // ✅ Ahora usamos LoginViewModelFactory que crea AuthRepository internamente
+    private val loginViewModel: LoginViewModel by viewModels {
+        LoginViewModelFactory()
     }
+
+    private lateinit var credentialManager: CredentialManager
+    private lateinit var googleIdOption: GetGoogleIdOption
+    private lateinit var credentialRequest: GetCredentialRequest
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityLoginBinding.inflate(layoutInflater).also {
-            setContentView(it.root)
-        }
-        setupListeners()
+
+        binding = ActivityLoginBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+
+        setupCredentialManager()
+        setupUi()
         setupObservers()
     }
 
-    private fun setupListeners() {
+    private fun setupCredentialManager() {
+        credentialManager = CredentialManager.create(this)
 
-        binding.username.addTextChangedListener { onCredentialsChanged() }
-        binding.password.apply {
-            addTextChangedListener { onCredentialsChanged() }
+        googleIdOption = GetGoogleIdOption.Builder()
+            // IMPORTANTE: este es tu "default_web_client_id" (web client id)
+            .setServerClientId(getString(R.string.default_web_client_id))
+            // true = solo cuentas ya autorizadas, false = permite crear nuevas
+            .setFilterByAuthorizedAccounts(false)
+            .build()
 
-            setOnEditorActionListener { _, actionId, _ ->
-                if (actionId == EditorInfo.IME_ACTION_DONE) {
-                    performLogin()
-                }
-                false
-            }
-        }
-        binding.btnLogin.setOnClickListener {
-            binding.loading.visibility = android.view.View.VISIBLE
-            performLogin()
-        }
-        binding.registerNow.setOnClickListener {
-            startActivity(Intent(this@LoginActivity, RegisterActivity::class.java))
+        credentialRequest = GetCredentialRequest.Builder()
+            .addCredentialOption(googleIdOption)
+            .build()
+    }
+
+    private fun setupUi() {
+        // Tu login tradicional (email/contraseña) seguiría igual aquí…
+
+        binding.btnLoginGoogle.setOnClickListener {
+            signInWithGoogle()
         }
     }
 
     private fun setupObservers() {
-        loginViewModel.loginFormState.observe(this, Observer { state ->
-            state ?: return@Observer
+        // Observas loginResult como ya venías haciendo
+        loginViewModel.loginResult.observe(this) { result ->
+            result?.success?.let { loggedInUserView ->
+                Toast.makeText(
+                    this,
+                    getString(R.string.welcome) + " " + loggedInUserView.displayName,
+                    Toast.LENGTH_SHORT
+                ).show()
+                // Ir a MainActivity o lo que corresponda
+                // startActivity(Intent(this, MainActivity::class.java))
+                // finish()
+            }
 
-            binding.btnLogin.isEnabled = state.isDataValid
-            binding.username.error = state.usernameError?.let { getString(it) }
-            binding.password.error = state.passwordError?.let { getString(it) }
-        })
-
-        loginViewModel.loginResult.observe(this, Observer { result ->
-            result ?: return@Observer
-
-            binding.loading.visibility = android.view.View.GONE
-
-            result.error?.let { showLoginFailed(it) }
-            result.success?.let { updateUiWithUser(it) }
-
-            setResult(RESULT_OK)
-            finish()
-        })
+            result?.error?.let {
+                Toast.makeText(this, getString(it), Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
-    private fun onCredentialsChanged() {
-        val email = binding.username.text.toString()
-        val password = binding.password.text.toString()
-        loginViewModel.loginDataChanged(email, password)
-    }
+    // ✅ Flujo moderno: pedir credenciales a Credential Manager
+    private fun signInWithGoogle() {
+        lifecycleScope.launch {
+            try {
+                val result = credentialManager.getCredential(
+                    context = this@LoginActivity,
+                    request = credentialRequest
+                )
 
-    private fun performLogin() {
-        val email = binding.username.text.toString()
-        val password = binding.password.text.toString()
-        loginViewModel.login(email, password)
-    }
+                val credential = result.credential
 
-    private fun updateUiWithUser(model: LoggedInUserView) {
-        val welcome = getString(R.string.welcome)
-        Toast.makeText(
-            applicationContext,
-            "$welcome ${model.displayName}",
-            Toast.LENGTH_LONG
-        ).show()
-        startActivity(Intent(this, MainActivity::class.java))
-    }
+                if (credential is CustomCredential &&
+                    credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL
+                ) {
+                    // Extraer el token de Google
+                    val googleIdTokenCredential =
+                        GoogleIdTokenCredential.createFrom(credential.data)
+                    val idToken = googleIdTokenCredential.idToken
 
-    private fun showLoginFailed(@StringRes errorRes: Int) {
-        Toast.makeText(applicationContext, errorRes, Toast.LENGTH_SHORT).show()
-        startActivity(Intent(this, LoginActivity::class.java))
+                    // Enviar token al ViewModel
+                    loginViewModel.loginWithGoogleIdToken(idToken)
+                } else {
+                    Toast.makeText(
+                        this@LoginActivity,
+                        "La credencial no es de tipo Google ID Token",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+
+            } catch (e: GetCredentialException) {
+                // Usuario canceló, no hay credenciales, etc.
+                Toast.makeText(
+                    this@LoginActivity,
+                    "No se pudo obtener la credencial: ${e.message}",
+                    Toast.LENGTH_SHORT
+                ).show()
+            } catch (e: GoogleIdTokenParsingException) {
+                Toast.makeText(
+                    this@LoginActivity,
+                    "Error al procesar el token de Google",
+                    Toast.LENGTH_SHORT
+                ).show()
+            } catch (e: Exception) {
+                Toast.makeText(
+                    this@LoginActivity,
+                    "Error inesperado: ${e.message}",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
     }
 }

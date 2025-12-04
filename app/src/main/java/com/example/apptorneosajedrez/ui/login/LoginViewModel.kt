@@ -2,7 +2,6 @@ package com.example.apptorneosajedrez.ui.login
 
 import androidx.lifecycle.*
 import android.util.Patterns
-import com.example.apptorneosajedrez.data.LoginRepository
 import com.example.apptorneosajedrez.data.Result
 import com.example.apptorneosajedrez.R
 import com.example.apptorneosajedrez.data.model.LoginFormState
@@ -10,8 +9,12 @@ import com.example.apptorneosajedrez.data.model.LoginResult
 import kotlinx.coroutines.launch
 import java.io.IOException
 
+import androidx.lifecycle.*
+import com.example.apptorneosajedrez.data.AuthRepository
+import kotlinx.coroutines.launch
+
 class LoginViewModel(
-    private val loginRepository: LoginRepository
+    private val authRepository: AuthRepository
 ) : ViewModel() {
 
     private val _loginForm = MutableLiveData<LoginFormState>()
@@ -21,26 +24,41 @@ class LoginViewModel(
     val loginResult: LiveData<LoginResult> = _loginResult
 
     fun login(email: String, password: String) {
-        // Opcional: podrías exponer un LiveData<Boolean> para mostrar un ProgressBar
         viewModelScope.launch {
-            try {
-                when (val result = loginRepository.login(email, password)) {
-                    is Result.Success -> {
-                        val displayName = result.data.displayName
-                        _loginResult.value = LoginResult(
-                            success = LoggedInUserView(displayName = displayName)
+            when (val result = authRepository.loginWithEmailAndPassword(email, password)) {
+                is Result.Success -> {
+                    val user = result.data
+                    _loginResult.value = LoginResult(
+                        success = LoggedInUserView(
+                            displayName = user.fullName ?: user.email ?: "Usuario"
                         )
-                    }
-
-                    is Result.Error -> {
-                        _loginResult.value = LoginResult(error = R.string.login_failed)
-                    }
+                    )
                 }
-            } catch (_: IOException) {
-                _loginResult.value = LoginResult(error = R.string.login_failed)
+                is Result.Error -> {
+                    _loginResult.value = LoginResult(error = R.string.login_failed)
+                }
             }
         }
     }
+
+    fun loginWithGoogleIdToken(idToken: String) {
+        viewModelScope.launch {
+            when (val result = authRepository.loginWithGoogleIdToken(idToken)) {
+                is Result.Success -> {
+                    val user = result.data
+                    _loginResult.value = LoginResult(
+                        success = LoggedInUserView(
+                            displayName = user.fullName ?: user.email ?: "Usuario"
+                        )
+                    )
+                }
+                is Result.Error -> {
+                    _loginResult.value = LoginResult(error = R.string.login_failed)
+                }
+            }
+        }
+    }
+
 
     fun loginDataChanged(username: String, password: String) {
         if (!isUserNameValid(username)) {

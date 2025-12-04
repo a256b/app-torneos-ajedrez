@@ -40,4 +40,5 @@
     <string name="google_sign_in">Ingresar con Google </string>
 
     <string name="default_web_client_id">1017845911463-lpivt8jtt099nskh62b4696vmi43ncpv.apps.googleusercontent.com</string>
+    <string name="ingresar_con_google">Ingresar con Google</string>
 </resources>
