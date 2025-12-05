@@ -26,7 +26,7 @@
         android:id="@+id/username"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:hint="Correo electrónico"
+        android:hint="@string/prompt_email"
         android:inputType="textEmailAddress"
         android:imeOptions="actionNext"
         app:layout_constraintTop_toBottomOf="@id/title"
@@ -38,7 +38,7 @@
         android:id="@+id/password"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:hint="Contraseña"
+        android:hint="@string/prompt_password"
         android:inputType="textPassword"
         android:imeOptions="actionDone"
         app:layout_constraintTop_toBottomOf="@id/username"
@@ -61,36 +61,37 @@
         android:id="@+id/btnLogin"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Ingresar"
+        android:text="@string/sign_in"
         app:layout_constraintTop_toBottomOf="@id/loading"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="24dp"/>
+        android:layout_marginTop="20dp"/>
+
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnGoogleSignIn"
         style="@style/Widget.MaterialComponents.Button.OutlinedButton"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="24dp"
         android:drawableStart="@drawable/googleg_standard_color_18"
         android:drawablePadding="8dp"
-        android:text="Continuar con Google"
+        android:text="@string/ingresar_con_google"
         app:iconGravity="textStart"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/btnLogin" />
-
+        app:layout_constraintTop_toBottomOf="@+id/registerNow" />
 
     <TextView
         android:id="@+id/registerNow"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="¿No tienes cuenta? Regístrate"
+        android:layout_marginTop="20dp"
+        android:text="@string/click_to_register"
         android:textSize="14sp"
-        app:layout_constraintTop_toBottomOf="@id/btnGoogleSignIn"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="24dp"/>
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btnLogin" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
