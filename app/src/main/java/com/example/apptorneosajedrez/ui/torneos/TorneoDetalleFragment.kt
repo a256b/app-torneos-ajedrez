@@ -10,6 +10,7 @@ import com.example.apptorneosajedrez.databinding.FragmentTorneoDetalleBinding
 import com.example.apptorneosajedrez.ui.movimientos.MovesActivity
 import com.example.apptorneosajedrez.data.InscripcionRepository
 import com.example.apptorneosajedrez.model.Torneo
+import com.example.apptorneosajedrez.ui.fixture.FixtureActivity
 
 class TorneoDetalleFragment : Fragment() {
 
@@ -43,16 +44,20 @@ class TorneoDetalleFragment : Fragment() {
             binding.tvUbicacion.text = "Lugar: ${t.ubicacion}"
             binding.tvDescripcion.text = t.descripcion
 
-            // Cargar cantidad de inscriptos
             repoInscripciones.escucharInscripciones { inscripciones ->
                 val cantidad = inscripciones.count { it.idTorneo == t.idTorneo.toString() }
                 binding.tvCantidadInscriptos.text = "Inscriptos: $cantidad"
             }
         }
 
-
         binding.btnVerPartidas.setOnClickListener {
             val intent = Intent(requireContext(), MovesActivity::class.java)
+            startActivity(intent)
+        }
+
+        binding.btnVerFixture.setOnClickListener {
+            val intent = Intent(requireContext(), FixtureActivity::class.java)
+            intent.putExtra("torneo", torneo)
             startActivity(intent)
         }
     }
