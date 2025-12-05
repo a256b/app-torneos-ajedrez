@@ -13,7 +13,9 @@ import androidx.lifecycle.lifecycleScope
 import androidx.credentials.CredentialManager
 import androidx.credentials.CustomCredential
 import androidx.credentials.GetCredentialRequest
+import androidx.credentials.exceptions.GetCredentialCancellationException
 import androidx.credentials.exceptions.GetCredentialException
+import androidx.credentials.exceptions.NoCredentialException
 import com.example.apptorneosajedrez.MainActivity
 import com.example.apptorneosajedrez.R
 import com.example.apptorneosajedrez.databinding.ActivityLoginBinding
@@ -113,16 +115,24 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun launchGoogleSignIn() {
+        val clientId = getString(R.string.default_web_client_id)
+        Log.d("Auth", "=== Iniciando Google Sign-In ===")
+        Log.d("Auth", "Client ID: $clientId")
+        Log.d("Auth", "Package Name: ${packageName}")
+
         val request = GetCredentialRequest.Builder()
             .addCredentialOption(googleIdOption)
             .build()
 
         lifecycleScope.launch {
             try {
+                Log.d("Auth", "Solicitando credencial...")
                 val result = credentialManager.getCredential(
                     request = request,
                     context = this@LoginActivity
                 )
+
+                Log.d("Auth", "Credencial obtenida, tipo: ${result.credential.type}")
 
                 val credential = result.credential
                 if (credential is CustomCredential &&
@@ -131,8 +141,10 @@ class LoginActivity : AppCompatActivity() {
                     val googleIdTokenCredential =
                         GoogleIdTokenCredential.createFrom(credential.data)
                     val idToken = googleIdTokenCredential.idToken
+                    Log.d("Auth", "ID Token obtenido exitosamente")
                     loginViewModel.loginWithGoogle(idToken)
                 } else {
+                    Log.e("Auth", "Tipo de credencial inesperado: ${credential.type}")
                     Toast.makeText(
                         this@LoginActivity,
                         "Credencial de Google no válida",
@@ -140,24 +152,42 @@ class LoginActivity : AppCompatActivity() {
                     ).show()
                 }
 
-            } catch (e: GetCredentialException) {
-                Log.e("Auth", "Error GetCredential: ${e::class.java.name} - ${e.message}", e)
+            } catch (_: GetCredentialCancellationException) {
+                Log.d("Auth", "Usuario canceló el login")
 
+            } catch (e: NoCredentialException) {
+                Log.e("Auth", "NoCredentialException: ${e.message}", e)
                 Toast.makeText(
                     this@LoginActivity,
-                    "No se pudo obtener credencial de Google: ${e.message}",
-                    Toast.LENGTH_SHORT
+                    "No hay cuentas de Google disponibles",
+                    Toast.LENGTH_LONG
                 ).show()
-            } catch (e: Exception) {
-                Log.e("Auth", "Error inesperado: ${e::class.java.name} - ${e.message}", e)
 
+            } catch (e: GetCredentialException) {
+                Log.e("Auth", "GetCredentialException: ${e::class.java.simpleName}")
+                Log.e("Auth", "Mensaje: ${e.message}", e)
+                Log.e("Auth", "Causa: ${e.cause?.message}")
+
+                // Mensaje más específico
+                val errorMsg = when {
+                    e.message?.contains("SIGN_IN_REQUIRED") == true ->
+                        "Se requiere autenticación. Verifica tu configuración de OAuth."
+                    e.message?.contains("DEVELOPER_ERROR") == true ->
+                        "Error de configuración. Verifica SHA-1 y Client ID."
+                    else -> "Error: ${e.message}"
+                }
+
+                Toast.makeText(this@LoginActivity, errorMsg, Toast.LENGTH_LONG).show()
+
+            } catch (e: Exception) {
+                Log.e("Auth", "Error inesperado: ${e::class.java.name}")
+                Log.e("Auth", "Mensaje: ${e.message}", e)
                 Toast.makeText(
                     this@LoginActivity,
-                    "Error inesperado: ${e.message}",
-                    Toast.LENGTH_SHORT
+                    "Error: ${e.message}",
+                    Toast.LENGTH_LONG
                 ).show()
             }
-
         }
     }
 }
