@@ -1,12 +1,13 @@
-// RegisterActivity.kt
 package com.example.apptorneosajedrez.ui.register
 
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import android.view.inputmethod.EditorInfo
+import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.widget.addTextChangedListener
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.example.apptorneosajedrez.databinding.ActivityRegisterBinding
 import com.example.apptorneosajedrez.ui.login.LoginActivity
@@ -22,75 +23,77 @@ class RegisterActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         binding = ActivityRegisterBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        setupUserTypeSpinner()
         setupObservers()
         setupListeners()
     }
 
+    private fun setupUserTypeSpinner() {
+        // Ejemplo simple de tipos de usuario
+        val userTypes = listOf("player", "organizer", "admin")
+        val adapter = ArrayAdapter(
+            this,
+            android.R.layout.simple_spinner_dropdown_item,
+            userTypes
+        )
+        binding.userTypeSpinner.adapter = adapter
+    }
 
     private fun setupObservers() {
-        registerViewModel.registerFormState.observe(this) { state ->
-            state ?: return@observe
+        registerViewModel.uiState.observe(this, Observer { state ->
+            binding.loading.visibility = if (state.isLoading) View.VISIBLE else View.GONE
 
-            binding.btnRegister.isEnabled = state.isDataValid
-
-            state.fullNameError?.let { binding.fullName.error = getString(it) }
-            state.emailError?.let { binding.username.error = getString(it) }
-            state.passwordError?.let { binding.password.error = getString(it) }
-            state.confirmPasswordError?.let { binding.confirmPassword.error = getString(it) }
-        }
-
-        registerViewModel.registerResult.observe(this) { result ->
-            result ?: return@observe
-
-            binding.loading.visibility = if (result.loading) View.VISIBLE else View.GONE
-
-            result.error?.let {
-                Toast.makeText(this, it, Toast.LENGTH_LONG).show()
+            state.errorMessage?.let { msg ->
+                Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
             }
 
-            result.success?.let { user ->
-                Toast.makeText(this, "Usuario creado: ${user.fullName}", Toast.LENGTH_LONG).show()
-                startActivity(Intent(this, LoginActivity::class.java))
+            state.registeredUser?.let {
+                Toast.makeText(this, "Usuario registrado correctamente", Toast.LENGTH_SHORT).show()
+                // Vuelvo al login
+                val intent = Intent(this, LoginActivity::class.java)
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
+                startActivity(intent)
                 finish()
             }
+        })
+    }
+
+    private fun setupListeners() = with(binding) {
+        btnRegister.setOnClickListener {
+            performRegister()
+        }
+
+        confirmPassword.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                performRegister()
+                true
+            } else {
+                false
+            }
+        }
+
+        haveAccount.setOnClickListener {
+            finish() // vuelve al LoginActivity
         }
     }
 
-    private fun setupListeners() {
-        // Cada vez que cambia un campo, se valida el formulario
-        val watcher: (String) -> Unit = {
-            registerViewModel.registerDataChanged(
-                fullName = binding.fullName.text.toString(),
-                email = binding.username.text.toString(),
-                password = binding.password.text.toString(),
-                confirmPassword = binding.confirmPassword.text.toString()
-            )
-        }
+    private fun performRegister() {
+        val fullName = binding.fullName.text.toString().trim()
+        val email = binding.username.text.toString().trim()
+        val password = binding.password.text.toString()
+        val confirmPassword = binding.confirmPassword.text.toString()
+        val userType = binding.userTypeSpinner.selectedItem?.toString() ?: "player"
 
-        binding.fullName.addTextChangedListener { watcher(it.toString()) }
-        binding.username.addTextChangedListener { watcher(it.toString()) }
-        binding.password.addTextChangedListener { watcher(it.toString()) }
-        binding.confirmPassword.addTextChangedListener { watcher(it.toString()) }
-
-        binding.btnRegister.setOnClickListener {
-            val fullName = binding.fullName.text.toString().trim()
-            val email = binding.username.text.toString().trim()
-            val password = binding.password.text.toString()
-            val confirmPassword = binding.confirmPassword.text.toString()
-
-            registerViewModel.register(
-                fullName = fullName,
-                email = email,
-                password = password,
-                confirmPassword = confirmPassword
-            )
-        }
-
-        binding.loginNow.setOnClickListener {
-            startActivity(Intent(this@RegisterActivity, LoginActivity::class.java))
-        }
+        registerViewModel.register(
+            fullName = fullName,
+            email = email,
+            password = password,
+            confirmPassword = confirmPassword,
+            userType = userType
+        )
     }
 }

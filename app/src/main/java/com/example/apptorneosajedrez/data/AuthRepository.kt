@@ -2,112 +2,122 @@ package com.example.apptorneosajedrez.data
 
 import com.example.apptorneosajedrez.model.AppUser
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.firestore.FirebaseFirestore
-import kotlinx.coroutines.suspendCancellableCoroutine
-import kotlin.coroutines.resume
-//import kotlin.coroutines.resumeWithException
-//
-//import com.example.apptorneosajedrez.data.Result
+import kotlinx.coroutines.tasks.await
 
 class AuthRepository(
-    private val firebaseAuth: FirebaseAuth = FirebaseAuth.getInstance(),
-    private val db: FirebaseFirestore = FirebaseFirestore.getInstance(),
-
+    private val auth: FirebaseAuth,
+    private val firestore: FirebaseFirestore
 ) {
 
+    companion object {
+        private const val USERS_COLLECTION = "users"
 
-        fun registerUser(
-            fullName: String,
-            email: String,
-            password: String,
-            userType: String,
-            callback: (Result<AppUser>) -> Unit
-        ) {
-            firebaseAuth.createUserWithEmailAndPassword(email, password)
-                .addOnCompleteListener { task ->
-                    if (!task.isSuccessful) {
-                        callback(Result.Error(task.exception ?: Exception("Error creando usuario")))
-                        return@addOnCompleteListener
-                    }
-
-                    val firebaseUser = firebaseAuth.currentUser
-                    val uid = firebaseUser?.uid
-
-                    if (uid == null) {
-                        callback(Result.Error(Exception("No se pudo obtener el UID del usuario")))
-                        return@addOnCompleteListener
-                    }
-
-                    val appUser = AppUser(
-                        uid = uid,
-                        fullName = fullName,
-                        email = email,
-                        userType = userType,
-                        provider = "PASSWORD"
-                    )
-
-                    // Guardar en colección "users" (documento con id = uid)
-                    db.collection("usuarios")
-                        .document(uid)
-                        .set(appUser)
-                        .addOnSuccessListener {
-                            callback(Result.Success(appUser))
-                        }
-                        .addOnFailureListener { e ->
-                            callback(Result.Error(e))
-                        }
-                }
+        // Método de conveniencia para usar desde las ViewModelFactory
+        fun getInstance(): AuthRepository {
+            val auth = FirebaseAuth.getInstance()
+            val firestore = FirebaseFirestore.getInstance()
+            return AuthRepository(auth, firestore)
         }
-    // Login tradicional por email/contraseña
-    suspend fun loginWithEmailAndPassword(email: String, password: String): Result<AppUser> =
-        suspendCancellableCoroutine { cont ->
-            firebaseAuth.signInWithEmailAndPassword(email, password)
-                .addOnSuccessListener { authResult ->
-                    val user = authResult.user
-                    if (user != null) {
-                        val appUser = AppUser(
-                            uid = user.uid,
-                            fullName = user.displayName,
-                            email = user.email,
-                            provider = "PASSWORD"
-                        )
-                        cont.resume(Result.Success(appUser))
-                    } else {
-                        cont.resume(Result.Error(Exception("Usuario nulo después de login con email.")))
-                    }
-                }
-                .addOnFailureListener { e ->
-                    if (cont.isActive) {
-                        cont.resume(Result.Error(e))
-                    }
-                }
-        }
+    }
 
-    // Login con Google usando idToken
-    suspend fun loginWithGoogleIdToken(idToken: String): Result<AppUser> =
-        suspendCancellableCoroutine { cont ->
-            val credential = GoogleAuthProvider.getCredential(idToken, null)
+    fun getCurrentFirebaseUser(): FirebaseUser? = auth.currentUser
 
-            firebaseAuth.signInWithCredential(credential)
-                .addOnSuccessListener { authResult ->
-                    val user = authResult.user
-                    if (user != null) {
-                        val appUser = AppUser(
-                            uid = user.uid,
-                            fullName = user.displayName,
-                            email = user.email,
-                            provider = "GOOGLE"
-                        )
-                        cont.resume(Result.Success(appUser))
-                    } else {
-                        cont.resume(Result.Error(Exception("Usuario nulo después de autenticarse con Google.")))
-                    }
-                }
-                .addOnFailureListener { e ->
-                    if (cont.isActive) {
-                        cont.resume(Result.Error(e))
-                    }
-                }
+    fun logout() {
+        auth.signOut()
+    }
+
+    /**
+     * Login con email y contraseña.
+     * Lanza excepción si falla.
+     */
+    suspend fun loginWithEmail(email: String, password: String): AppUser {
+        val result = auth.signInWithEmailAndPassword(email, password).await()
+        val user = result.user ?: throw IllegalStateException("Usuario no disponible")
+        return ensureUserDocument(user)
+    }
+
+    /**
+     * Login con Google usando el idToken obtenido con Credential Manager.
+     * Lanza excepción si falla.
+     */
+    suspend fun loginWithGoogle(idToken: String): AppUser {
+        val credential = GoogleAuthProvider.getCredential(idToken, null)
+        val result = auth.signInWithCredential(credential).await()
+        val user = result.user ?: throw IllegalStateException("Usuario no disponible")
+        return ensureUserDocument(user)
+    }
+
+    /**
+     * Registro con email y contraseña + creación de documento en Firestore.
+     * userType podría ser "admin", "player", etc.
+     */
+    suspend fun registerWithEmail(
+        fullName: String,
+        email: String,
+        password: String,
+        userType: String
+    ): AppUser {
+        val result = auth.createUserWithEmailAndPassword(email, password).await()
+        val user = result.user ?: throw IllegalStateException("Usuario no disponible")
+
+        val appUser = AppUser(
+            uid = user.uid,
+            email = email,
+            fullName = fullName,
+            userType = userType,
+        )
+
+        firestore.collection(USERS_COLLECTION)
+            .document(user.uid)
+            .set(appUser)
+            .await()
+
+        return appUser
+    }
+
+    /**
+     * Carga el documento de usuario desde Firestore, si existe.
+     */
+    suspend fun loadCurrentUserProfile(): AppUser? {
+        val firebaseUser = auth.currentUser ?: return null
+        val snapshot = firestore.collection(USERS_COLLECTION)
+            .document(firebaseUser.uid)
+            .get()
+            .await()
+
+        return if (snapshot.exists()) {
+            snapshot.toObject(AppUser::class.java)?.copy(uid = firebaseUser.uid)
+        } else {
+            null
         }
+    }
+
+    /**
+     * Si el documento no existe, lo crea usando los datos del FirebaseUser.
+     */
+    private suspend fun ensureUserDocument(firebaseUser: FirebaseUser): AppUser {
+        val docRef = firestore.collection(USERS_COLLECTION).document(firebaseUser.uid)
+        val snapshot = docRef.get().await()
+
+        return if (snapshot.exists()) {
+            snapshot.toObject(AppUser::class.java)?.copy(uid = firebaseUser.uid)
+                ?: defaultFromFirebaseUser(firebaseUser).also {
+                    docRef.set(it).await()
+                }
+        } else {
+            val appUser = defaultFromFirebaseUser(firebaseUser)
+            docRef.set(appUser).await()
+            appUser
+        }
+    }
+
+    private fun defaultFromFirebaseUser(user: FirebaseUser): AppUser =
+        AppUser(
+            uid = user.uid,
+            email = user.email ?: "",
+            fullName = user.displayName,
+        )
 }

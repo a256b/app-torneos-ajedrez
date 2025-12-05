@@ -5,5 +5,5 @@ data class AppUser(
     val fullName: String? = "",
     val email: String? = "",
     val userType: String = "",      // "AFICIONADO", "JUGADOR", "ORGANIZADOR"
-    val provider: String            // "google", "password", etc.
+   // val provider: String            // "google", "password", etc.
 )

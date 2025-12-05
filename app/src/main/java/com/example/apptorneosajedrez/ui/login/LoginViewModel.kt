@@ -1,80 +1,71 @@
 package com.example.apptorneosajedrez.ui.login
 
-import androidx.lifecycle.*
-import android.util.Patterns
-import com.example.apptorneosajedrez.data.Result
-import com.example.apptorneosajedrez.R
-import com.example.apptorneosajedrez.data.model.LoginFormState
-import com.example.apptorneosajedrez.data.model.LoginResult
-import kotlinx.coroutines.launch
-import java.io.IOException
-
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.apptorneosajedrez.data.AuthRepository
+import com.example.apptorneosajedrez.model.AppUser
 import kotlinx.coroutines.launch
+
+data class LoginUiState(
+    val isLoading: Boolean = false,
+    val errorMessage: String? = null,
+    val loggedInUser: AppUser? = null
+)
 
 class LoginViewModel(
     private val authRepository: AuthRepository
 ) : ViewModel() {
 
-    private val _loginForm = MutableLiveData<LoginFormState>()
-    val loginFormState: LiveData<LoginFormState> = _loginForm
+    private val _uiState = MutableLiveData(LoginUiState())
+    val uiState: LiveData<LoginUiState> = _uiState
 
-    private val _loginResult = MutableLiveData<LoginResult>()
-    val loginResult: LiveData<LoginResult> = _loginResult
+    fun loginWithEmail(email: String, password: String) {
+        if (email.isBlank() || password.isBlank()) {
+            _uiState.value = LoginUiState(
+                isLoading = false,
+                errorMessage = "Correo y contraseña son obligatorios"
+            )
+            return
+        }
 
-    fun login(email: String, password: String) {
+        _uiState.value = _uiState.value?.copy(isLoading = true, errorMessage = null)
+
         viewModelScope.launch {
-            when (val result = authRepository.loginWithEmailAndPassword(email, password)) {
-                is Result.Success -> {
-                    val user = result.data
-                    _loginResult.value = LoginResult(
-                        success = LoggedInUserView(
-                            displayName = user.fullName ?: user.email ?: "Usuario"
-                        )
-                    )
-                }
-                is Result.Error -> {
-                    _loginResult.value = LoginResult(error = R.string.login_failed)
-                }
+            try {
+                val user = authRepository.loginWithEmail(email, password)
+                _uiState.value = LoginUiState(
+                    isLoading = false,
+                    errorMessage = null,
+                    loggedInUser = user
+                )
+            } catch (e: Exception) {
+                _uiState.value = LoginUiState(
+                    isLoading = false,
+                    errorMessage = e.message ?: "Error al iniciar sesión"
+                )
             }
         }
     }
 
-    fun loginWithGoogleIdToken(idToken: String) {
+    fun loginWithGoogle(idToken: String) {
+        _uiState.value = _uiState.value?.copy(isLoading = true, errorMessage = null)
+
         viewModelScope.launch {
-            when (val result = authRepository.loginWithGoogleIdToken(idToken)) {
-                is Result.Success -> {
-                    val user = result.data
-                    _loginResult.value = LoginResult(
-                        success = LoggedInUserView(
-                            displayName = user.fullName ?: user.email ?: "Usuario"
-                        )
-                    )
-                }
-                is Result.Error -> {
-                    _loginResult.value = LoginResult(error = R.string.login_failed)
-                }
+            try {
+                val user = authRepository.loginWithGoogle(idToken)
+                _uiState.value = LoginUiState(
+                    isLoading = false,
+                    errorMessage = null,
+                    loggedInUser = user
+                )
+            } catch (e: Exception) {
+                _uiState.value = LoginUiState(
+                    isLoading = false,
+                    errorMessage = e.message ?: "Error al iniciar sesión con Google"
+                )
             }
         }
-    }
-
-
-    fun loginDataChanged(username: String, password: String) {
-        if (!isUserNameValid(username)) {
-            _loginForm.value = LoginFormState(usernameError = R.string.invalid_username)
-        } else if (!isPasswordValid(password)) {
-            _loginForm.value = LoginFormState(passwordError = R.string.invalid_password)
-        } else {
-            _loginForm.value = LoginFormState(isDataValid = true)
-        }
-    }
-
-    private fun isUserNameValid(username: String): Boolean {
-        return Patterns.EMAIL_ADDRESS.matcher(username).matches()
-    }
-
-    private fun isPasswordValid(password: String): Boolean {
-        return password.length > 1
     }
 }
