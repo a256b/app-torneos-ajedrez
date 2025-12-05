@@ -2,6 +2,7 @@ package com.example.apptorneosajedrez.ui.login
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.Toast
@@ -140,18 +141,23 @@ class LoginActivity : AppCompatActivity() {
                 }
 
             } catch (e: GetCredentialException) {
+                Log.e("Auth", "Error GetCredential: ${e::class.java.name} - ${e.message}", e)
+
                 Toast.makeText(
                     this@LoginActivity,
                     "No se pudo obtener credencial de Google: ${e.message}",
                     Toast.LENGTH_SHORT
                 ).show()
             } catch (e: Exception) {
+                Log.e("Auth", "Error inesperado: ${e::class.java.name} - ${e.message}", e)
+
                 Toast.makeText(
                     this@LoginActivity,
                     "Error inesperado: ${e.message}",
                     Toast.LENGTH_SHORT
                 ).show()
             }
+
         }
     }
 }
