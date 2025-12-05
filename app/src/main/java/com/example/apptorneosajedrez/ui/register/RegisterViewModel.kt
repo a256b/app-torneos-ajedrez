@@ -1,5 +1,6 @@
 package com.example.apptorneosajedrez.ui.register
 
+import android.util.Patterns
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -35,6 +36,20 @@ class RegisterViewModel(
             return
         }
 
+        if (!isEmailValid(email)) {
+            _uiState.value = RegisterUiState(
+                errorMessage = "Formato de correo inválido"
+            )
+            return
+        }
+
+        if (!isPasswordValid(password)) {
+            _uiState.value = RegisterUiState(
+                errorMessage = "Contraseña inválida. Debe tener al menos 8 caracteres, una mayúscula, una minúscula y un número"
+            )
+            return
+        }
+
         if (password != confirmPassword) {
             _uiState.value = RegisterUiState(
                 errorMessage = "Las contraseñas no coinciden"
@@ -63,5 +78,16 @@ class RegisterViewModel(
                 )
             }
         }
+    }
+
+    private fun isEmailValid(email: String): Boolean {
+        return Patterns.EMAIL_ADDRESS.matcher(email).matches()
+    }
+
+    private fun isPasswordValid(password: String): Boolean {
+        val passwordRegex = Regex(
+            pattern = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).{8,}$"
+        )
+        return passwordRegex.matches(password)
     }
 }
